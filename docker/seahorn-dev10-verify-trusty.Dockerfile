@@ -57,7 +57,7 @@ RUN cp trusty/vendor/google/aosp/scripts/build.py build.py.oirg && \
 RUN trusty/vendor/google/aosp/scripts/build.py generic-arm32 
 
 ## To test that everything is working pre-generate bc files for our verification tasks
-RUN cmake -DSEA_LINK=llvm-link-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10 -DSEAHORN_ROOT=../../seahorn ../ -GNinja
+RUN mkdir build && cd build && cmake -DSEA_LINK=llvm-link-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10 -DSEAHORN_ROOT=../../seahorn ../ -GNinja
 
 ## set default user and wait for someone to login and start running verification tasks
 USER usea
