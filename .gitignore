@@ -1,0 +1,19 @@
+# seahorn generated files # 
+*.z3-trace
+*.bc
+*.ll
+*.dot
+
+# trusty repository contents fetched with repo #
+prebuilts/
+.repo/
+external/
+hardware/
+lk_inc.mk
+makefile
+system/
+tools/
+trusty/
+build-root/
+build/
+compile_commands.json

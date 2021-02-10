@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+"""
+Verify script for seahorn verification jobs
+return code
+0 - all ok
+1 - expected string not found in stderr/stdout
+2 - error reported to stderr
+"""
+import os
+import os.path
+import re
+import sys
+
+SEAHORN_ROOT = "@SEAHORN_ROOT@"
+ASSERT_ERROR_PREFIX = r'^Error: assertion failed'
+# the plan is to have two sets, vac error and info and put filepath:linenumbers) into both
+VACUITY_CHECK_RE = r'^(?P<stream>Info|Error).*(?P<what>vacuity).*(?P<result>passed|failed).*sat\) (?P<debuginfo>.*)$'
+
+def check_vacuity(line, passed_set, failed_set):
+    m = re.match(VACUITY_CHECK_RE, line)
+    if not m:
+        return
+    debugInfo = m.group('debuginfo')
+    if (m.group('stream') == 'Info'
+        and m.group('what') == 'vacuity'
+        and m.group('result') == 'passed'):
+        passed_set.add(debugInfo.strip())
+    elif (m.group('stream') == 'Error'
+        and m.group('what') == 'vacuity'
+        and m.group('result') == 'failed'):
+        failed_set.add(debugInfo.strip())
+
+
+def main(argv):
+    import sea
+
+    def check_vacuity_inner(line, passed_set, failed_set):
+        return check_vacuity(line, passed_set, failed_set)
+
+    class VerifyCmd(sea.CliCmd):
+        def __init__(self):
+            super().__init__('verify', 'Verify', allow_extra=True)
+
+        def mk_arg_parser(self, argp):
+            import argparse
+            argp = super().mk_arg_parser(argp)
+
+            argp.add_argument('-v', '--verbose', action='store_true',
+                              default=False)
+            argp.add_argument('--silent', action='store_true', default=False,
+                              help='Do not produce any output')
+            argp.add_argument('--expect', type=str, default=None,
+                              help='Expected string in the output')
+            argp.add_argument('--command', type=str, default='bpf',
+                              help='sea command')
+            argp.add_argument('--cex', action='store_true', default=False,
+                              help='Counterexample mode')
+            argp.add_argument('--vac', action='store_true', default=False,
+                              help='Vacuity mode')
+            argp.add_argument('input_file', nargs=1)
+            argp.add_argument('--dry-run', dest='dry_run',
+                              action='store_true', default=False,
+                              help='Pass --dry-run to yama')
+            argp.add_argument('extra', nargs=argparse.REMAINDER)
+            return argp
+
+        def run(self, args=None, _extra=[]):
+            extra = _extra + args.extra
+
+            script_dir = os.path.abspath(sys.argv[0])
+            script_dir = os.path.dirname(script_dir)
+
+            input_file = os.path.abspath(args.input_file[0])
+
+            # try to guess input file from directory name
+            if os.path.isdir(input_file):
+                fname = os.path.basename(input_file)
+                _input_file = os.path.join(input_file, 'llvm-ir', fname + '.ir',
+                                           fname + '.ir.bc')
+                if os.path.isfile(_input_file):
+                    input_file = _input_file
+
+
+            file_dir = input_file
+            file_dir = os.path.dirname(file_dir)
+
+            cmd = [os.path.join(SEAHORN_ROOT, 'bin', 'sea'),
+                   'yama', '--yforce']
+
+            # base config
+            base_config = os.path.join(script_dir, 'seahorn', 'sea.yaml')
+            if args.cex:
+                base_config = os.path.join(script_dir, 'seahorn',
+                                           'sea.cex.yaml')
+            cmd.extend(['-y', base_config])
+
+            # vacuity config
+            if args.vac:
+                vac_config = os.path.join(script_dir, 'seahorn',
+                                          'sea.vac.yaml')
+                cmd.extend(['-y', vac_config])
+
+            # job specific config
+            job_config = os.path.abspath(os.path.join(file_dir, '..', '..',
+                                                      'sea.yaml'))
+            cmd.extend(['-y', job_config])
+
+            if args.dry_run:
+                cmd.append('--dry-run')
+
+            cmd.append(args.command)
+            cmd.extend(extra)
+            cmd.append(input_file)
+
+            if args.verbose:
+                print(' '.join(cmd))
+   
+            if args.expect is None:
+                os.execv(cmd[0], cmd)
+
+            import subprocess
+            process = subprocess.Popen(cmd, shell=False,
+                                       encoding='utf-8',
+                                       errors='ignore',
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT)
+            found_expected = False
+            found_error = False
+            vacuity_passed = set()
+            vacuity_failed = set()
+            for line in iter(process.stdout.readline, ''):
+                if not args.silent:
+                    print(line, end='')
+
+                # checks after this line are mutually exclusive
+                if not found_expected and args.expect is not None and line.strip() == args.expect:
+                    found_expected = True
+                elif re.match(ASSERT_ERROR_PREFIX, line):
+                    found_error = True
+                else:
+                    check_vacuity_inner(line, vacuity_passed, vacuity_failed)
+               
+            process.stdout.close()
+            rcode = process.wait()
+
+            if args.vac and found_error:
+                return 2
+            elif args.vac and (vacuity_failed - vacuity_passed):
+                return 2
+            elif rcode == 0 and args.expect is not None:
+                return 0 if found_expected else 1
+            else:
+                return rcode
+
+    cmd = VerifyCmd()
+
+    # read extra flags from environment variable
+    if 'VERIFY_FLAGS' in os.environ:
+        env_flags = os.environ['VERIFY_FLAGS']
+        env_flags = env_flags.split()
+        argv = env_flags + argv
+
+    return cmd.main(argv)
+
+
+if __name__ == '__main__':
+    root = os.path.abspath(SEAHORN_ROOT)
+
+    bin_dir = os.path.join(root, 'bin')
+    if os.path.isdir(bin_dir):
+        os.environ['PATH'] = bin_dir + os.pathsep + os.environ['PATH']
+
+    seapy_dir = os.path.join(root, 'lib', 'seapy')
+    if os.path.isdir(seapy_dir):
+        sys.path.insert(0, seapy_dir)
+
+    sys.exit(main(sys.argv[1:]))

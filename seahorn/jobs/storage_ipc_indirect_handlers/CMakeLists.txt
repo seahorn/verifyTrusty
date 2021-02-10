@@ -1,0 +1,9 @@
+
+add_executable(storage_ipc_indirect_handlers
+ipc.instrument.c
+main.c)
+sea_overlink_libraries(storage_ipc_indirect_handlers trusty_msg.ir)
+sea_overlink_libraries(storage_ipc_indirect_handlers realloc_override.ir)
+sea_attach_bc_link(storage_ipc_indirect_handlers)
+configure_file(sea.yaml sea.yaml @ONLY)
+sea_add_unsat_test(storage_ipc_indirect_handlers)
