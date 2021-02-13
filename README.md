@@ -1,4 +1,7 @@
 # Verifying TEE applications with SeaHorn
+
+![os](https://img.shields.io/badge/os-linux-orange?logo=linux)
+
 Wiki and useful background materials: https://github.com/agurfinkel/verifyTrusty/wiki
 
 ## Background
@@ -10,36 +13,51 @@ Applications running on TEEs are juicy attack targets. The goal of this project 
 All harnesses and stubs within this repository depend on the *Trusty* repository. To run verification jobs locally, follow steps below to install/build missing dependencies and trusty:
 
 #### Dependencies
-- `clang-5.0` and `llvm-link-5.0`
+- `clang-10.0` and `llvm-link-10.0`
 - [Repo](https://source.android.com/setup/build/downloading#installing-repo)
-- [Bear](https://github.com/rizsotto/Bear)
 - SeaHorn, use [docker image](http://seahorn.github.io/seahorn/install/docker/2018/02/24/seahorn-with-docker.html) or [build from source](http://seahorn.github.io/seahorn/install/2016/10/14/install-seahorn.html) then set `$SEA` or `$SEAHORN` environment variable to `<path_to_build_dir>/run/bin/sea` executable.
 
 #### Install and build trusty
 
-1. Clone this repository
+1. Clone this repository (change your diretory into verifyTrusty)
 
-2. [download and install trusty](https://source.android.com/security/trusty/download-and-build) under the same directory.
+2. [download and install trusty](https://source.android.com/security/trusty/download-and-build):
+    ```
+    mkdir trusty && cd trusty && \
+    repo init -u https://android.googlesource.com/trusty/manifest -b master && \
+    repo sync -j32 && cd .. \
+    ```
 
-3. [Build trusty](https://github.com/agurfinkel/verifyTrusty/wiki#building-trusty) and generate compile dependency list file with BEAR
-
-Once the above steps are finished, you should see a file `compile_commands.json` in the current directory.
-
-Alternatively, use our docker image to play around existing verification examples.
-
-
-## Generating LLVM assembly for verification
-SeaHorn can work with most LLVM based languages, including C, C++ and LLVM assembly. In order to model irrelevant or overly-complicated functions and data structures, stub files and harness file (code under verification that is slightly modified) are compiled individually into LLVM by `clang`, then linked together into the final target file by `llvm-link`.  After a trusty build is finished with compile dependencies stored in `compile_commands.json`, you can create LLVM assembly files for all jobs under `seahorn/jobs/` by running:
-
-`python3 seahorn/gen_bc.py`
-
-To see details of compilation and linking, add `--verbose` or `-v`
-
-To do a "dry run" with no compilation or linking actually taking place, add `--dry`, prints the same details as `--verbose` mode
-
-To run specific jobs `--jobs <dir_name>`
-
-If LLVM bitcode generation is successful, you should see `out.bc` files under `seahorn/jobs/<job_name>/`.
+3. Using CMake to build LLVM assembly:
+    ```
+    mkdir build && cd build && cmake \
+   -DSEA_LINK=llvm-link-10 \
+   -DCMAKE_C_COMPILER=clang-10 \
+   -DCMAKE_CXX_COMPILER=clang++-10 \
+   -DSEAHORN_ROOT=<SEAHORN_ROOT> \
+   ../ -GNinja
+    ```
+    If LLVM bitcode generation is successful, you should see `<BC_FILE_NAME>.ir.bc` files under `seahorn/jobs/<job_name>/llvm-ir/<job_name>.ir`.
+4. Compile
+    ```
+    ninja
+    ```
+    or
+    ```
+    cmake --build .
+    ```
+5. Verify as unit test
+    ```
+    ninja test
+    ```
+    or
+    ```
+    cmake --build . --target test
+    ```
+6. Run individual file manually
+    ```
+    ./verify [option] <BC_FILE_NAME>
+    ```
 
 ### Current examples (under `seahorn/jobs/`)
 1. `storage_ipc_port_create_destroy` simple example that shows `SeaHorn` can
@@ -47,8 +65,7 @@ If LLVM bitcode generation is successful, you should see `out.bc` files under `s
    `ipc_port_destroy`; this example also shows that stubbing of handles table
    (`seahorn/lib/handle_table.c`) works.
 
-    - Build command: `python3 seahorn/gen_bc.py --jobs storage_ipc_port_create_destroy`
-    - Verification command: `$SEAHORN bpf -m32 -O3 --bmc=mono --horn-bv2=true  --horn-bv2-ptr-size=4 --horn-bv2-word-size=4 --no-lower-gv-init seahorn/jobs/storage_ipc_port_create_destroy/out.bc  --inline -S --devirt-functions=types`
+    - Verification command: `./verify seahorn/jobs/storage_ipc_port_create_destroy`
     - Expected output: `unsat`, meaning no `sassert` is not violated.
 
 2. `storage_ipc_indirect_handlers` the `storage` application use function
@@ -56,14 +73,12 @@ If LLVM bitcode generation is successful, you should see `out.bc` files under `s
    demonstrates that `SeaHorn` can model this programming pattern by applying
    its function devirtualization pass.
 
-    - Build command: `python3 seahorn/gen_bc.py --jobs storage_ipc_indirect_handlers`
-    - Verification command: `$SEAHORN bpf -m32 -O3 --bmc=mono --horn-bv2=true  --horn-bv2-ptr-size=4 --horn-bv2-word-size=4 --no-lower-gv-init seahorn/jobs/storage_ipc_indirect_handlers/out.bc  --inline --devirt-functions  -S`
+    - Verification command: `./verify seahorn/jobs/storage_ipc_indirect_handlers`
     - Expected output: `unsat`, meaning no `sassert` is not violated.
 
 3. `storage_ipc_msg_buffer` test potential buffer overflow on `msg_buf` by stubbing `realloc`.
 
-    - Build command: `python3 seahorn/gen_bc.py --jobs storage_ipc_msg_buffer`
-    - Verification command: `$SEAHORN bpf -m32 -O3 --bmc=mono --horn-bv2=true  --horn-bv2-ptr-size=4 --horn-bv2-word-size=4 --no-lower-gv-init seahorn/jobs/storage_ipc_msg_buffer/out.bc  --inline --devirt-functions=sea-dsa  -S --externalize-addr-taken-functions`
+    - Verification command: `./verify seahorn/jobs/storage_ipc_msg_buffer`
     - Expected output: `unsat`, meaning no overflow is not possible. 
     - Try removing `return ERR_NOT_ENOUGH_BUFFER` block on line `150` in
       `ipc.c`, and rebuild the verification example. Doing so should
