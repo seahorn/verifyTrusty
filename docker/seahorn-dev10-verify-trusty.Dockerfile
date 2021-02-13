@@ -41,22 +41,14 @@ COPY . verifyTrusty
 ## clony trusty repository (takes a long time)
 WORKDIR /home/usea/verifyTrusty
 RUN echo "Installing Trusty" && \
-    cd /home/usea//verifyTrusty && \
     mkdir /home/usea/bin/ && curl https://storage.googleapis.com/git-repo-downloads/repo > /home/usea/bin/repo && \
     chmod a+x /home/usea/bin/repo && \
+    mkdir trusty && cd trusty && \
     python3 /home/usea/bin/repo init -u https://android.googlesource.com/trusty/manifest -b master && \
     python3 /home/usea/bin/repo sync -j32 
 
-## use our custom build script
-## TODO: use a patch instead of a copy of the script
-RUN cp trusty/vendor/google/aosp/scripts/build.py build.py.oirg && \
-    git remote update && git pull origin master && cp bear_build.py trusty/vendor/google/aosp/scripts/build.py 
-
-## Build trusty. We use 32 bits because verification is easier with fewer bits.
-## Maybe consider using 64-bits in the future
-RUN trusty/vendor/google/aosp/scripts/build.py generic-arm32 
-
 ## To test that everything is working pre-generate bc files for our verification tasks
+WORKDIR /home/usea/verifyTrusty
 RUN mkdir build && cd build && cmake -DSEA_LINK=llvm-link-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10 -DSEAHORN_ROOT=../../seahorn ../ -GNinja
 
 ## set default user and wait for someone to login and start running verification tasks
