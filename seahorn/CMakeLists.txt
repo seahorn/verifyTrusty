@@ -170,17 +170,20 @@ function(sea_attach_bc name)
   target_compile_options(${SOURCE_EXE} PUBLIC -Wno-macro-redefined)
   target_compile_options(${SOURCE_EXE} PUBLIC -g)
   target_compile_options(${SOURCE_EXE} PUBLIC -fdeclspec)
-  target_compile_options(${SOURCE_EXE} PUBLIC -include ${TRUSTY_BUILD_ROOT}/build-generic-arm32/config.h)
-  target_compile_options(${SOURCE_EXE} PUBLIC -o ${TRUSTY_BUILD_ROOT}/build-generic-arm32/trusty/kernel/lib/trusty/ipc.o)
   target_compile_options(${SOURCE_EXE} PUBLIC 
-  -march=armv8-a -mfpu=crypto-neon-fp-armv8 -mfloat-abi=softfp -target arm-linux-gnu 
-  --gcc-toolchain=${PROJECT_SOURCE_DIR}/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/ -fvisibility=hidden 
-  -flto=thin -fsanitize=cfi -fstack-protector-strong -Wstrict-prototypes -Wwrite-strings -mthumb
-  --include ${TRUSTY_BUILD_ROOT}/build-generic-arm32/user_tasks/trusty/user/app/storage/trusty/user/app/storage/module_config.h
+  -mfloat-abi=softfp -target ${TRUSTY_TARGET}-linux-gnu 
+  --gcc-toolchain=${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/${TRUSTY_TARGET}/${TRUSTY_TARGET}-linux-androideabi-4.9/ -fvisibility=hidden 
+  -flto=thin -fstack-protector-strong -Wstrict-prototypes -Wwrite-strings -mthumb
   )
+  # The following options need to be revised for x86_64
+  # target_compile_options(${SOURCE_EXE} PUBLIC 
+  # -mcmodel=kernel -mno-red-zone -msoft-float -target x86_64-linux-gnu 
+  # --gcc-toolchain=${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9/ -fno-pic
+  # -ffunction-sections -fdata-sections -fno-stack-protector -fasynchronous-unwind-tables -Wstrict-prototypes -Wwrite-strings
+  # )
   set_property(TARGET ${SOURCE_EXE} PROPERTY EXCLUDE_FROM_ALL ON)
 
-  target_compile_definitions(${SOURCE_EXE} PUBLIC __thumb__ CFI_ENABLED)
+  target_compile_definitions(${SOURCE_EXE} PUBLIC __thumb__)
   target_compile_definitions(${SOURCE_EXE} PRIVATE __SEAHORN__)
   target_compile_definitions(${SOURCE_EXE} PRIVATE VACCHECK)
 

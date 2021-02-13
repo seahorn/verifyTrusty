@@ -5,6 +5,9 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvmir)
 include(LLVMIRUtil)
 include(CTest)
 
+EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
+message(${ARCHITECTURE})
+
 # Enable CTest
 enable_testing()
 
@@ -27,8 +30,8 @@ set(SEA_PP "${SEAHORN_ROOT}/bin/seapp" CACHE STRING  "Path to seapp binary")
 set(LLVMIR_OPT ${SEA_OPT})
 
 set(TRUSTY_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/trusty)
-set(TRUSTY_BUILD_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/build-root)
-set(EXTERNAL_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/external)
+set(TRUSTY_TARGET "arm" CACHE STRING "Trusty target for verification")
+set(EXTERNAL_ROOT ${TRUSTY_ROOT}/external)
 
 set(SEA_LIB ${CMAKE_CURRENT_SOURCE_DIR}/seahorn/lib)
 
@@ -41,16 +44,16 @@ include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/include)
 include_directories(seahorn/include)
 
 # Include header's directories
-include_directories(trusty/device/arm/generic-arm64/include/user)
-include_directories(trusty/device/x86/generic-x86_64/include/user)
-include_directories(trusty/user/app/storage)
-include_directories(trusty/user/base/interface/storage/include)
-include_directories(trusty/user/base/include/uapi)
-include_directories(trusty/user/base/include/shared)
-include_directories(trusty/user/base/include/user)
-include_directories(trusty/kernel/include/uapi/)
-include_directories(external/lk/include/shared/)
-include_directories(external/lk/include/uapi/)
+include_directories(${TRUSTY_ROOT}/trusty/device/${TRUSTY_TARGET}/generic-${TRUSTY_TARGET}64/include/user)
+# include_directories(${TRUSTY_ROOT}/trusty/device/x86/generic-x86_64/include/user)
+include_directories(${TRUSTY_ROOT}/trusty/user/app/storage)
+include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/storage/include)
+include_directories(${TRUSTY_ROOT}/trusty/user/base/include/uapi)
+include_directories(${TRUSTY_ROOT}/trusty/user/base/include/shared)
+include_directories(${TRUSTY_ROOT}/trusty/user/base/include/user)
+include_directories(${TRUSTY_ROOT}/trusty/kernel/include/uapi/)
+include_directories(${TRUSTY_ROOT}/external/lk/include/shared/)
+include_directories(${TRUSTY_ROOT}/external/lk/include/uapi/)
 
 include_directories(${SEAHORN_ROOT}/include)
 add_subdirectory(seahorn)
