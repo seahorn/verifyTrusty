@@ -170,20 +170,23 @@ function(sea_attach_bc name)
   target_compile_options(${SOURCE_EXE} PUBLIC -Wno-macro-redefined)
   target_compile_options(${SOURCE_EXE} PUBLIC -g)
   target_compile_options(${SOURCE_EXE} PUBLIC -fdeclspec)
-  target_compile_options(${SOURCE_EXE} PUBLIC 
-  -mfloat-abi=softfp -target ${TRUSTY_TARGET}-linux-gnu 
-  --gcc-toolchain=${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/${TRUSTY_TARGET}/${TRUSTY_TARGET}-linux-androideabi-4.9/ -fvisibility=hidden 
-  -flto=thin -fstack-protector-strong -Wstrict-prototypes -Wwrite-strings -mthumb
-  )
-  # The following options need to be revised for x86_64
-  # target_compile_options(${SOURCE_EXE} PUBLIC 
-  # -mcmodel=kernel -mno-red-zone -msoft-float -target x86_64-linux-gnu 
-  # --gcc-toolchain=${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9/ -fno-pic
-  # -ffunction-sections -fdata-sections -fno-stack-protector -fasynchronous-unwind-tables -Wstrict-prototypes -Wwrite-strings
-  # )
+  target_compile_options(${SOURCE_EXE} PUBLIC -Wstrict-prototypes -Wwrite-strings)
+  target_compile_options(${SOURCE_EXE} PUBLIC -target ${TARGET_ARCH}-linux-gnu 
+  --gcc-toolchain=${GCC_TOOLCHAIN_DIR})
+  if (${TRUSTY_TARGET} STREQUAL "arm32")
+    target_compile_options(${SOURCE_EXE} PRIVATE -mfloat-abi=softfp
+    -fstack-protector-strong -mthumb
+    )
+    target_compile_definitions(${SOURCE_EXE} PRIVATE __thumb__)
+  elseif(${TRUSTY_TARGET} STREQUAL "x86_64")
+    target_compile_options(${SOURCE_EXE} PRIVATE -mcmodel=kernel -mno-red-zone -msoft-float
+    -fno-pic -ffunction-sections -fdata-sections -fno-stack-protector -fasynchronous-unwind-tables )
+  else ()
+  target_compile_options(${SOURCE_EXE} PRIVATE
+  -fno-short-enums -fno-common -fno-omit-frame-pointer -ffixed-x18 -ffunction-sections -fdata-sections -fno-stack-protector -fasynchronous-unwind-tables )
+  endif()
   set_property(TARGET ${SOURCE_EXE} PROPERTY EXCLUDE_FROM_ALL ON)
 
-  target_compile_definitions(${SOURCE_EXE} PUBLIC __thumb__)
   target_compile_definitions(${SOURCE_EXE} PRIVATE __SEAHORN__)
   target_compile_definitions(${SOURCE_EXE} PRIVATE VACCHECK)
 

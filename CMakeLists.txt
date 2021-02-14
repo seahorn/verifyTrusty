@@ -5,9 +5,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvmir)
 include(LLVMIRUtil)
 include(CTest)
 
-EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
-message(${ARCHITECTURE})
-
 # Enable CTest
 enable_testing()
 
@@ -30,8 +27,23 @@ set(SEA_PP "${SEAHORN_ROOT}/bin/seapp" CACHE STRING  "Path to seapp binary")
 set(LLVMIR_OPT ${SEA_OPT})
 
 set(TRUSTY_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/trusty)
-set(TRUSTY_TARGET "arm" CACHE STRING "Trusty target for verification")
+set(TRUSTY_TARGET "arm32" CACHE STRING "Trusty target for verification")
 set(EXTERNAL_ROOT ${TRUSTY_ROOT}/external)
+
+# Set gcc-toolchain directory
+if (${TRUSTY_TARGET} STREQUAL "arm32")
+  set(GCC_TOOLCHAIN_DIR
+    ${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/)
+  set(TARGET_ARCH "arm")
+elseif(${TRUSTY_TARGET} STREQUAL "x86_64")
+  set(TARGET_ARCH "${TRUSTY_TARGET}")
+  set(GCC_TOOLCHAIN_DIR
+  ${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9/)
+else() # arm64 = aarch64
+  set(TARGET_ARCH "aarch64")
+  set(GCC_TOOLCHAIN_DIR
+  ${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/)
+endif()
 
 set(SEA_LIB ${CMAKE_CURRENT_SOURCE_DIR}/seahorn/lib)
 
@@ -44,8 +56,6 @@ include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/include)
 include_directories(seahorn/include)
 
 # Include header's directories
-include_directories(${TRUSTY_ROOT}/trusty/device/${TRUSTY_TARGET}/generic-${TRUSTY_TARGET}64/include/user)
-# include_directories(${TRUSTY_ROOT}/trusty/device/x86/generic-x86_64/include/user)
 include_directories(${TRUSTY_ROOT}/trusty/user/app/storage)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/storage/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/include/uapi)
