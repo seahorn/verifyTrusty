@@ -34,10 +34,10 @@ All harnesses and stubs within this repository depend on the *Trusty* repository
    -DSEA_LINK=llvm-link-10 \
    -DCMAKE_C_COMPILER=clang-10 \
    -DCMAKE_CXX_COMPILER=clang++-10 \
-   -DSEAHORN_ROOT=<SEAHORN_ROOT> \
+   -DSEAHORN_ROOT=<SEAHORN_ROOT> -DTRUSTY_TARGET=<TRUSTY_TARGET> \
    ../ -GNinja
     ```
-    If LLVM bitcode generation is successful, you should see `<BC_FILE_NAME>.ir.bc` files under `seahorn/jobs/<job_name>/llvm-ir/<job_name>.ir`.
+    Note that, the *trusty target* now supports `arm32`, `arm64`, and `x86_64`. If LLVM bitcode generation is successful, you should see `<BC_FILE_NAME>.ir.bc` files under `seahorn/jobs/<job_name>/llvm-ir/<job_name>.ir`.
 4. Compile
     ```
     ninja
