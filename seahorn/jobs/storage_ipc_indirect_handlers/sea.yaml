@@ -1,3 +1,3 @@
 verify_options:
-  horn-bv2-word-size: 4
-  horn-bv2-ptr-size: 4
+  horn-bv2-word-size: 8
+  horn-bv2-ptr-size: 8
