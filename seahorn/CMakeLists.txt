@@ -235,6 +235,15 @@ function(sea_add_unsat_test TARGET)
   add_test(NAME "${TARGET}_unsat_test" COMMAND ${VERIFY_CMD} ${VERIFY_FLAGS} --expect=unsat ${BC})
 endfunction()
 
+# Set upper bound on data structures
+set(MSG_BUF_MAX_SIZE 4096)
+
+# Compile-time definitions
+add_definitions(
+  -DMSG_BUF_MAX_SIZE=${MSG_BUF_MAX_SIZE}
+)
+
+configure_file(include/config.h.in ${PROJECT_BINARY_DIR}/include/config.h)
 configure_file(sea.yaml sea.yaml @ONLY)
 configure_file(sea_cex_base.yaml sea.cex.yaml @ONLY)
 configure_file(sea_vac.yaml sea.vac.yaml @ONLY)
