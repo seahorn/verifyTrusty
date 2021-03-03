@@ -1,0 +1,31 @@
+name: CI
+
+on: 
+  push:
+    branches: master
+  pull_request:
+    branches: master
+  schedule:
+    - cron: 0 0 * * *  # run every day at UTC 00:00
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        verify_flag: ["", "--vac", "--cex"]
+       
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@master
+      
+      - name: Get type
+        id: type
+        run: echo ::set-output name=type::$(echo ${{ matrix.verify_flag }} | awk '{ print substr($1,3,5) "" substr($2,22) }')
+      
+      - name: Docker 
+        run: docker build -t verify-trusty . --file docker/seahorn-dev10-verify-trusty.Dockerfile
+      
+      - name: Run Tests 
+        run: docker run -t verify-trusty /bin/bash -c "cd build && mkdir -p /tmp/verifyTrusty && env VERIFY_FLAGS=\"${{ matrix.verify_flag }}\" ctest --output-on-failure --timeout 2000 .
