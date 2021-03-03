@@ -181,6 +181,7 @@ err_read_msg:
 
 static void do_disconnect(struct ipc_channel_context* context,
                           const uevent_t* ev) {
+    sassert(context->node.prev != NULL && context->node.next != NULL);
     list_delete(&context->node);
     context->ops.on_disconnect(context);
     close(ev->handle);
@@ -355,7 +356,7 @@ int sync_ipc_send_msg(handle_t session,
     return read_len;
 }
 
-void dispatch_event(const uevent_t* ev) {
+static void dispatch_event(const uevent_t* ev) {
     assert(ev);
 
     if (ev->event == IPC_HANDLE_POLL_NONE) {
