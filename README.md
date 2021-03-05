@@ -24,7 +24,7 @@ All harnesses and stubs within this repository depend on the *Trusty* repository
 2. [download and install trusty](https://source.android.com/security/trusty/download-and-build):
     ```
     mkdir trusty && cd trusty && \
-    repo init -u https://android.googlesource.com/trusty/manifest -b master && \
+    repo init -u https://github.com/seahorn/verifyTrusty.git -b master && \
     repo sync -j32 && cd .. \
     ```
 
