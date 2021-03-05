@@ -86,7 +86,10 @@
   <!-- END toolchains -->
 
   <!-- BEGIN aux external projects -->
-  <project path="external/linux" name="kernel/common" revision="android-trusty-5.4" groups="trusty" />
+  
+  <!--
+     AG: everything seems to work without linux kernel. re-enabled when needed.
+     <project path="external/linux" name="kernel/common" revision="android-trusty-5.4" groups="trusty" /> -->
   <project path="external/qemu" name="trusty/external/qemu" groups="trusty" />
   <project path="external/capstone" name="platform/external/capstone" revision="f1f1cbc054db7021d4167a96b55783e087e1b7b4" groups="trusty" />
   <project path="external/dtc" name="platform/external/dtc" groups="trusty" />
