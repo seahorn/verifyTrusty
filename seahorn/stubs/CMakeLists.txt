@@ -15,3 +15,6 @@ sea_attach_bc(logger)
 
 add_library(wide_trusty_msg wide/trusty_msg.c)
 sea_attach_bc(wide_trusty_msg)
+
+add_library(time_override time_override.c)
+sea_attach_bc(time_override)
