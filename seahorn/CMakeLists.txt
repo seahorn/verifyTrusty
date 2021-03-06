@@ -221,6 +221,11 @@ function(sea_attach_bc_link name)
   sea_attach_bc(${name})
 endfunction()
 
+function(sea_attach_bc_cc_link name)
+  sea_link_libraries(${name} sea_proofs.ir)
+  sea_attach_bc_cc(${name})
+endfunction()
+
 function(add_subset_test_target TEST_TARGET_NAME TEST_EXEC SET_NAME)
 
 # This adds the "make subset test" target.
@@ -253,3 +258,4 @@ add_subdirectory(lib)
 add_subdirectory(jobs/storage_ipc_indirect_handlers)
 add_subdirectory(jobs/storage_ipc_msg_buffer)
 add_subdirectory(jobs/storage_ipc_port_create_destroy)
+add_subdirectory(jobs/gatekeeper_ipc)
