@@ -50,4 +50,7 @@ RUN echo "Installing Trusty" && \
 
 ## To test that everything is working pre-generate bc files for our verification tasks
 WORKDIR /home/usea/verifyTrusty
-RUN mkdir build && cd build && cmake -DSEA_LINK=llvm-link-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10 -DSEAHORN_ROOT=../../seahorn -DTRUSTY_TARGET=arm32 ../ -GNinja
+RUN mkdir build && cd build && cmake -DSEA_LINK=llvm-link-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10 -DSEAHORN_ROOT=/home/usea/seahorn -DTRUSTY_TARGET=arm32 ../ -GNinja && cmake --build .
+
+## set default user and wait for someone to login and start running verification tasks
+USER usea
