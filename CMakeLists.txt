@@ -32,17 +32,11 @@ set(EXTERNAL_ROOT ${TRUSTY_ROOT}/external)
 
 # Set gcc-toolchain directory
 if (${TRUSTY_TARGET} STREQUAL "arm32")
-  set(GCC_TOOLCHAIN_DIR
-    ${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/)
   set(TARGET_ARCH "arm")
 elseif(${TRUSTY_TARGET} STREQUAL "x86_64")
   set(TARGET_ARCH "${TRUSTY_TARGET}")
-  set(GCC_TOOLCHAIN_DIR
-  ${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9/)
 else() # arm64 = aarch64
   set(TARGET_ARCH "aarch64")
-  set(GCC_TOOLCHAIN_DIR
-  ${TRUSTY_BUILD_ROOT}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/)
 endif()
 
 set(SEA_LIB ${CMAKE_CURRENT_SOURCE_DIR}/seahorn/lib)
