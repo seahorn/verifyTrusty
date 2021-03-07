@@ -10,6 +10,9 @@ sea_attach_bc(trusty_msg)
 add_library(fprintf_override fprintf_override.c)
 sea_attach_bc(fprintf_override)
 
+add_library(ipc_loop_override ipc_loop_override.c)
+sea_attach_bc(ipc_loop_override)
+
 add_library(logger logger.cpp)
 sea_attach_bc(logger)
 
