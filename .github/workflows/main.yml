@@ -28,4 +28,4 @@ jobs:
         run: docker build -t verify-trusty . --file docker/seahorn-dev10-verify-trusty.Dockerfile
       
       - name: Run Tests 
-        run: docker run -t verify-trusty /bin/bash -c "cd build && mkdir -p /tmp/verifyTrusty && env VERIFY_FLAGS=\"${{ matrix.verify_flag }}\" ctest --output-on-failure --timeout 2000 .
+        run: docker run -t verify-trusty /bin/bash -c "cd build && mkdir -p /tmp/verifyTrusty && env VERIFY_FLAGS=\"${{ matrix.verify_flag }}\" ctest --output-on-failure --timeout 2000 ."
