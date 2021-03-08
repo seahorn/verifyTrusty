@@ -11,7 +11,7 @@
 #include "seahorn/seahorn.h"
 
 using namespace gatekeeper;
-TrustyGateKeeper *ver_device;
+extern TrustyGateKeeper *device;
 
 extern gatekeeper_error_t tipc_err_to_gatekeeper_err(long tipc_err);
 
@@ -39,7 +39,7 @@ int main(void) {
 
   TLOGI("Initializing\n");
 
-  ver_device = new TrustyGateKeeper();
+  device = new TrustyGateKeeper();
 
   rc = gatekeeper_ipc_init();
   if (rc < 0) {

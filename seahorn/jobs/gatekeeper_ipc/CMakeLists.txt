@@ -1,9 +1,9 @@
 add_executable(gatekeeper_ipc
 ${TRUSTY_ROOT}/trusty/user/app/gatekeeper/trusty_gatekeeper.cpp
 gatekeeper_ipc_harness.cpp)
+sea_link_libraries(gatekeeper_ipc gatekeeper_ipc_lib.ir)
 sea_overlink_libraries(gatekeeper_ipc trusty_msg.ir)
 sea_overlink_libraries(gatekeeper_ipc realloc_override.ir)
 sea_overlink_libraries(gatekeeper_ipc fprintf_override.ir)
 sea_overlink_libraries(gatekeeper_ipc time_override.ir)
-sea_link_libraries(gatekeeper_ipc gatekeeper_ipc_lib.ir)
 sea_attach_bc_cc_link(gatekeeper_ipc)
