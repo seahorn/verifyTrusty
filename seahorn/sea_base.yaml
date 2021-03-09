@@ -29,7 +29,7 @@ verify_options:
 # static allocator supports symbolic allocation size
   sea-opsem-allocator: static
 # stack allocation from a symbolic starting point
-  horn-explicit-sp0: true
+  horn-explicit-sp0: false
 # lambdas for memory
   horn-bv2-lambdas: ''
 # use z3 simplifier during vcgen
