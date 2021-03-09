@@ -187,6 +187,10 @@ function(sea_attach_bc name)
   endif()
   set_property(TARGET ${SOURCE_EXE} PROPERTY EXCLUDE_FROM_ALL ON)
 
+  if (ARGS_LINKER_LANGUAGE STREQUAL "CXX")
+    target_compile_options(${SOURCE_EXE} PUBLIC -fno-rtti -fno-exceptions)
+  endif()
+
   target_compile_definitions(${SOURCE_EXE} PRIVATE __SEAHORN__)
   target_compile_definitions(${SOURCE_EXE} PRIVATE VACCHECK)
 
