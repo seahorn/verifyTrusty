@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.18.4)
 project(verifyTrusty C CXX)
 
+string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvmir)
 include(LLVMIRUtil)
 include(CTest)
@@ -51,9 +53,6 @@ include_directories(seahorn/include)
 
 # Include header's directories
 include_directories(${TRUSTY_ROOT}/hardware/libhardware/include)
-include_directories(${TRUSTY_ROOT}/trusty/user/app/storage)
-include_directories(${TRUSTY_ROOT}/trusty/user/app/gatekeeper)
-include_directories(${TRUSTY_ROOT}/trusty/user/app/gatekeeper/ipc)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/storage/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/hwrng/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/keymaster/include)
@@ -73,7 +72,6 @@ include_directories(${TRUSTY_ROOT}/trusty/kernel/lib/ubsan/include)
 include_directories(${TRUSTY_ROOT}/system/gatekeeper/include/)
 include_directories(${TRUSTY_ROOT}/external/lk/include/shared/)
 include_directories(${TRUSTY_ROOT}/external/lk/include/uapi/)
-include_directories(${TRUSTY_ROOT}/external/libcxx/include)
 
 
 include_directories(${SEAHORN_ROOT}/include)

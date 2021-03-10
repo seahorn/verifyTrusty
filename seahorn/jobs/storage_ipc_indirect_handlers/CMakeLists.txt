@@ -1,7 +1,9 @@
 
 add_executable(storage_ipc_indirect_handlers
-${TRUSTY_ROOT}/trusty/user/app/storage/ipc.c
-main.c)
+  ${TRUSTY_ROOT}/trusty/user/app/storage/ipc.c
+  main.c)
+target_include_directories(storage_ipc_indirect_handlers 
+  PRIVATE ${TRUSTY_ROOT}/trusty/user/app/storage)
 sea_overlink_libraries(storage_ipc_indirect_handlers trusty_msg.ir)
 sea_overlink_libraries(storage_ipc_indirect_handlers realloc_override.ir)
 sea_overlink_libraries(storage_ipc_indirect_handlers fprintf_override.ir)

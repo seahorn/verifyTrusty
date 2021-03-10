@@ -11,7 +11,10 @@ add_library(fprintf_override fprintf_override.c)
 sea_attach_bc(fprintf_override)
 
 add_library(ipc_loop_override ipc_loop_override.c)
+target_include_directories(ipc_loop_override 
+  PRIVATE ${TRUSTY_ROOT}/trusty/user/app/storage)
 sea_attach_bc(ipc_loop_override)
+
 
 add_library(logger logger.cpp)
 sea_attach_bc(logger)
@@ -25,6 +28,9 @@ sea_attach_bc(time_override)
 add_library(gatekeeper_ipc_lib
   ${TRUSTY_ROOT}/trusty/user/app/gatekeeper/ipc/gatekeeper_ipc.cpp)
 target_compile_definitions(gatekeeper_ipc_lib PRIVATE main=_main)
+target_include_directories(gatekeeper_ipc_lib PRIVATE
+  ${TRUSTY_ROOT}/trusty/user/app/gatekeeper
+  ${TRUSTY_ROOT}/trusty/user/app/gatekeeper/ipc)
 sea_attach_bc_cc(gatekeeper_ipc_lib)
 
 # Externalize static functions
