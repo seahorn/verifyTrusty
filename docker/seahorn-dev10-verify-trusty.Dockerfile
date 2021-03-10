@@ -17,7 +17,8 @@ RUN echo "Pulling Verify Trusty environment" && \
         software-properties-common \
         sudo curl build-essential vim gdb git \
         python-dev python-setuptools python-pip libgraphviz-dev libc6-dev-i386 \
-        bear libssl-dev zip
+        bear libssl-dev zip \
+        libc++-10-dev libc++1-10
 
 ## Install latest cmake
 RUN apt -y remove --purge cmake
@@ -50,7 +51,7 @@ RUN echo "Installing Trusty" && \
 
 ## To test that everything is working pre-generate bc files for our verification tasks
 WORKDIR /home/usea/verifyTrusty
-RUN mkdir build && cd build && cmake -DSEA_LINK=llvm-link-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10 -DSEAHORN_ROOT=/home/usea/seahorn -DTRUSTY_TARGET=arm32 ../ -GNinja && cmake --build .
+RUN mkdir build && cd build && cmake -DSEA_LINK=llvm-link-10 -DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10 -DSEAHORN_ROOT=/home/usea/seahorn -DTRUSTY_TARGET=x86_64 ../ -GNinja && cmake --build .
 
 ## set default user and wait for someone to login and start running verification tasks
 USER usea
