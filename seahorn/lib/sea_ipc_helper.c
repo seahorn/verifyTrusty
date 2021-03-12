@@ -57,12 +57,10 @@ sea_channel_connect(struct ipc_port_context *parent_ctx,
 /*
  * constant variable of ipc_port_context
  */
-const static struct ipc_port_context ctx = {
+static struct ipc_port_context ctx = {
       .ops = {.on_connect = sea_channel_connect},
   };
 
 struct ipc_port_context* create_port_context(){
-    struct ipc_port_context* pctx = malloc(sizeof(struct ipc_port_context));
-    * pctx = ctx;
-  return pctx;
+  return &ctx;
 }
