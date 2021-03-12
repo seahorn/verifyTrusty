@@ -16,4 +16,5 @@ tools/
 trusty/
 build-root/
 build/
+debug/
 compile_commands.json
