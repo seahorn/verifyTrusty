@@ -4,9 +4,6 @@ sea_attach_bc(realloc_override)
 add_library(realloc realloc.c)
 sea_attach_bc(realloc)
 
-add_library(trusty_msg trusty_msg.c)
-sea_attach_bc(trusty_msg)
-
 add_library(fprintf_override fprintf_override.c)
 sea_attach_bc(fprintf_override)
 
@@ -19,9 +16,6 @@ sea_attach_bc(ipc_loop_override)
 add_library(logger logger.cpp)
 sea_attach_bc(logger)
 
-add_library(wide_trusty_msg wide/trusty_msg.c)
-sea_attach_bc(wide_trusty_msg)
-
 add_library(time_override time_override.c)
 sea_attach_bc(time_override)
 
@@ -32,6 +26,14 @@ target_include_directories(gatekeeper_ipc_lib PRIVATE
   ${TRUSTY_ROOT}/trusty/user/app/gatekeeper
   ${TRUSTY_ROOT}/trusty/user/app/gatekeeper/ipc)
 sea_attach_bc_cc(gatekeeper_ipc_lib)
+
+add_library(
+  trusty_api_override
+  trusty_messaging_api_override.c
+  trusty_handle_api_override.c
+  trusty_server_api_override.c
+)
+sea_attach_bc(trusty_api_override)
 
 # Externalize static functions
 set(LLVMIR_OPT ${SEA_PP})
