@@ -18,14 +18,19 @@
 #include <trusty_ipc.h> // -> ipc structs
 #include <uapi/err.h>   // NO_ERROR definition
 
-static uint32_t cur_msg_id;
-static bool cur_msg_retired = true;
+/** ID and status of the lastest message returned by get_msg **/
+static uint32_t g_cur_msg_id;
+static bool g_cur_msg_retired = true;
 
 static bool msg_retired(uint32_t msg_id) {
-  return msg_id == cur_msg_id && cur_msg_retired;
+  return msg_id == g_cur_msg_id && g_cur_msg_retired;
 }
 
-// get len of first iov of msg if there is any, otherwise 0
+/** get len of first iov of msg if there is any, otherwise 0
+XXX: under-approximating io vectors of size larger than 1 now,
+alternative way is to return the sum of iov_len for a  limited number of
+io vecs using a loop
+**/
 static size_t msg_capacity(ipc_msg_t *msg) {
   struct iovec *iovecs = msg->iov;
   if (msg->num_iov == 0)
@@ -33,7 +38,6 @@ static size_t msg_capacity(ipc_msg_t *msg) {
   return iovecs[0].iov_len;
 }
 
-/** messaging **/
 /** Gets meta-information about the next message in an incoming message queue */
 int get_msg(handle_t handle, ipc_msg_info_t *msg_info) {
   (void)handle;
@@ -43,8 +47,8 @@ int get_msg(handle_t handle, ipc_msg_info_t *msg_info) {
   if (retval == NO_ERROR) {
     assume(msg_len > 0);
     assume(msg_id > 0);
-    cur_msg_id = msg_id;
-    cur_msg_retired = false;
+    g_cur_msg_id = msg_id;
+    g_cur_msg_retired = false;
   } else {
     msg_len = 0;
     msg_id = 0;
@@ -91,8 +95,8 @@ int put_msg(handle_t handle, uint32_t msg_id) {
   // return NO_ERROR on success; a negative error otherwise
   // assume(retval == NO_ERROR || retval < 0);
   (void)handle;
-  if (cur_msg_id == msg_id) {
-    cur_msg_retired = true;
+  if (g_cur_msg_id == msg_id) {
+    g_cur_msg_retired = true;
   }
-  return nd_int();
+  return nd_put_msg_ret();
 }

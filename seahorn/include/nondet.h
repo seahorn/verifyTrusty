@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <trusty_ipc.h> // -> ipc structs
 
+#include <uapi/err.h> // trusty errors definitions
 #pragma once
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +14,12 @@ int32_t nd_int(void);
 uint8_t nd_char(void);
 uint32_t nd_unsigned(void);
 void* nd_ptr(void);
+
+/**
+ * for functions with return pattern:
+ * NO_ERROR on success; a negative error otherwise
+ **/
+int nd_trusty_errs(void);
 
 /* port_create */
 handle_t nd_port_handle(void);

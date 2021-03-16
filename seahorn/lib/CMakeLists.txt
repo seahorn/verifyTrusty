@@ -2,6 +2,7 @@
 add_library(sea_proofs
   handle_table.c
   sea_ipc_helper.c
+  nondet.c
 )
 
 target_include_directories(sea_proofs PRIVATE
