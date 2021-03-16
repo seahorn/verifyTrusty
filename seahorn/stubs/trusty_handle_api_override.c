@@ -9,7 +9,7 @@
 
 // trusty reference for definitions only
 #include <trusty_ipc.h> // -> ipc structs
-#include <uapi/err.h>   // NO_ERROR definition
+#include <uapi/err.h>   // trusty errors definitions
 
 /* Waits for an event to occur on a given handle for specified period of time.
 "[retval]: NO_ERROR if a valid event occurred within a specified timeout
@@ -19,12 +19,10 @@ occurred; < 0 for other errors"
 int wait(handle_t handle, uevent_t *event, uint32_t timeout_msecs) {
   (void)timeout_msecs;
   int ret = nd_wait_ret();
-  assume(ret == NO_ERROR || ret < 0);
   if (ret == NO_ERROR) {
     event->handle = handle;
     event->cookie = get_handle_cookie(event->handle);
     event->event = nd_event_flag();
-    assume(event->event < (uint32_t)0x16); // max is (1111)2
   }
   return ret;
 }
@@ -54,12 +52,9 @@ int wait_any(uevent_t *ev, uint32_t timeout_msecs) {
   ev->cookie = get_handle_cookie(ev->handle);
 
   event_flag = nd_event_flag();
-  assume(event_flag < (uint32_t)0x16); // max is (1111)2
   ev->event = event_flag;
 
-  int ret = nd_wait_any_ret();
-  assume(ret <= NO_ERROR);
-  return ret;
+  return nd_wait_any_ret();
 }
 
 /** Associates the caller-provided private data with a specified handle. */
@@ -72,7 +67,6 @@ int set_cookie(handle_t handle, void *cookie) {
   }
 
   int ret = nd_set_cookie_ret(); // model other results (including failure)
-  assume(ret <= 0); // NO_ERROR on success, < 0 error code otherwise
   if (ret == 0) {
     set_handle_cookie(handle, cookie);
   }
@@ -83,7 +77,6 @@ int set_cookie(handle_t handle, void *cookie) {
    from the handle table. */
 int close(handle_t handle) {
   int ret = nd_close_ret();
-  assume(ret <= 0); // "0 if success; a negative error otherwise"
   remove_handle(handle);
   return ret;
 }
