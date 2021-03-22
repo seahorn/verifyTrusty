@@ -49,7 +49,7 @@ set(VERIFY_CMD ${CMAKE_CURRENT_BINARY_DIR}/verify)
 
 include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/include)
 
-include_directories(seahorn/include)
+include_directories(seahorn/trusty_common/include)
 
 # Include header's directories
 include_directories(${TRUSTY_ROOT}/hardware/libhardware/include)
