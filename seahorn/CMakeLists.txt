@@ -221,12 +221,12 @@ function(sea_get_file_name VAR LLVMIR_TARGET)
 endfunction()
 
 function(sea_attach_bc_link name)
-  sea_link_libraries(${name} sea_proofs.ir)
+  sea_link_libraries(${name} sea_common_proofs.ir)
   sea_attach_bc(${name})
 endfunction()
 
 function(sea_attach_bc_cc_link name)
-  sea_link_libraries(${name} sea_proofs.ir)
+  sea_link_libraries(${name} sea_common_proofs.ir)
   sea_attach_bc_cc(${name})
 endfunction()
 
@@ -251,15 +251,12 @@ add_definitions(
   -DMSG_BUF_MAX_SIZE=${MSG_BUF_MAX_SIZE}
 )
 
-configure_file(include/config.h.in ${PROJECT_BINARY_DIR}/include/config.h)
 configure_file(sea.yaml sea.yaml @ONLY)
 configure_file(sea_cex_base.yaml sea.cex.yaml @ONLY)
 configure_file(sea_vac.yaml sea.vac.yaml @ONLY)
 
-add_subdirectory(stubs)
-add_subdirectory(lib)
+add_subdirectory(trusty_common)
 
-add_subdirectory(jobs/storage_ipc_indirect_handlers)
-add_subdirectory(jobs/storage_ipc_msg_buffer)
-add_subdirectory(jobs/storage_ipc_port_create_destroy)
-add_subdirectory(jobs/gatekeeper_ipc)
+add_subdirectory(storage)
+# add_subdirectory(gatekeeper)
+# add_subdirectory(keymaster)
