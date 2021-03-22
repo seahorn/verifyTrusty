@@ -1,0 +1,7 @@
+#pragma once
+/* clang-format off */
+#ifndef MSG_BUF_MAX_SIZE
+#define MSG_BUF_MAX_SIZE @MSG_BUF_MAX_SIZE@
+#endif
+
+/* clang-format on */
