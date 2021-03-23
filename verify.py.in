@@ -79,6 +79,15 @@ def main(argv):
                                            fname + '.ir.bc')
                 if os.path.isfile(_input_file):
                     input_file = _input_file
+                else:
+                    for root, dirs, files in os.walk(input_file):
+                        for name in dirs:
+                            if name.endswith('.ir'):
+                                _input_file = os.path.join(input_file, 'llvm-ir', name,
+                                           name + '.bc')
+                                break
+                    if os.path.isfile(_input_file):
+                        input_file = _input_file
 
 
             file_dir = input_file
