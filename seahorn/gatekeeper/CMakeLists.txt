@@ -1,3 +1,3 @@
 
 add_subdirectory(stubs)
-add_subdirectory(jobs)
+add_subdirectory(jobs/ipc)
