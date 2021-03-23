@@ -1,3 +1,6 @@
 include_directories(include)
 add_subdirectory(lib)
-add_subdirectory(ipc)
+add_subdirectory(stubs)
+add_subdirectory(jobs/ipc/indirect_handlers)
+add_subdirectory(jobs/ipc/msg_buffer)
+add_subdirectory(jobs/ipc/port_create_destroy)

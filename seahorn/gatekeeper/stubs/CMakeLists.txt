@@ -11,4 +11,4 @@ sea_attach_bc_cc(gatekeeper_ipc_lib)
 # C++ static function transfer to name with _Z<name>v
 set(LLVMIR_OPT ${SEA_PP})
 llvmir_attach_opt_pass_target(TARGET gatekeeper_ipc_lib.opt.ir DEPENDS gatekeeper_ipc_lib.ir
-  "--externalize-function=^_Z*" "-externalize-functions-delete=false" "--externalize-fns")
+  "--externalize-function=^_ZL*" "-externalize-functions-delete=false" "--externalize-fns")
