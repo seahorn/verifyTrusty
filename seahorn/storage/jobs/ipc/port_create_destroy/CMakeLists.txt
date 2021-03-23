@@ -1,0 +1,13 @@
+add_executable(storage_ipc_port_create_destroy
+  ${TRUSTY_ROOT}/trusty/user/app/storage/ipc.c
+  port_create_destroy_harness.c)
+target_include_directories(storage_ipc_port_create_destroy 
+  PRIVATE ${TRUSTY_ROOT}/trusty/user/app/storage
+  )
+sea_link_libraries(storage_ipc_port_create_destroy sea_storage_ipc_proofs.ir)
+sea_overlink_libraries(storage_ipc_port_create_destroy trusty_api_override.ir)
+sea_overlink_libraries(storage_ipc_port_create_destroy realloc_override.ir)
+sea_overlink_libraries(storage_ipc_port_create_destroy fprintf_override.ir)
+sea_overlink_libraries(storage_ipc_port_create_destroy ipc_loop_override.ir)
+sea_attach_bc_link(storage_ipc_port_create_destroy)
+sea_add_unsat_test(storage_ipc_port_create_destroy)
