@@ -258,5 +258,5 @@ configure_file(sea_vac.yaml sea.vac.yaml @ONLY)
 add_subdirectory(trusty_common)
 
 add_subdirectory(storage)
-# add_subdirectory(gatekeeper)
+add_subdirectory(gatekeeper)
 # add_subdirectory(keymaster)
