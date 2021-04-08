@@ -36,8 +36,9 @@ int main(void) {
   handle_t port = (handle_t)rc;
 
 /* enter main event loop */
-#pragma unroll 2
-  while (true) {
+  // Unroll the while loop only iterating twice
+  int unroll_time = 0;
+  while (unroll_time < 2) {
     event.handle = INVALID_IPC_HANDLE;
     event.event = 0;
     event.cookie = NULL;
@@ -55,6 +56,7 @@ int main(void) {
         gatekeeper_handle_channel(&event);
       }
     }
+    unroll_time ++;
   }
 
   return 0;

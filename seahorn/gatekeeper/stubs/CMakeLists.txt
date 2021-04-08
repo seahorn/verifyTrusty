@@ -4,7 +4,7 @@ target_compile_definitions(gatekeeper_ipc_lib PRIVATE main=_main)
 target_include_directories(gatekeeper_ipc_lib PRIVATE
   ${TRUSTY_ROOT}/trusty/user/app/gatekeeper
   ${TRUSTY_ROOT}/trusty/user/app/gatekeeper/ipc
-  ${TRUSTY_ROOT}/system/gatekeeper/include/gatekeeper)
+  ${TRUSTY_ROOT}/system/gatekeeper/include)
 sea_attach_bc_cc(gatekeeper_ipc_lib)
 
 # Externalize static functions
