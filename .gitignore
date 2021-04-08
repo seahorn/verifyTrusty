@@ -13,7 +13,7 @@ lk_inc.mk
 makefile
 system/
 tools/
-trusty/
+/trusty/
 build-root/
 build/
 debug/
