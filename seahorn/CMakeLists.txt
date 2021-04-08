@@ -171,7 +171,12 @@ function(sea_attach_bc name)
   target_compile_options(${SOURCE_EXE} PUBLIC -g)
   target_compile_options(${SOURCE_EXE} PUBLIC -fdeclspec)
   target_compile_options(${SOURCE_EXE} PUBLIC -Wstrict-prototypes -Wwrite-strings)
-  target_compile_options(${SOURCE_EXE} PUBLIC -target ${TARGET_ARCH}-linux-gnu)
+
+  # work-around for Mac
+  if (NOT APPLE)
+    target_compile_options(${SOURCE_EXE} PUBLIC -target ${TARGET_ARCH}-linux-gnu)
+  endif()
+
   if (${TRUSTY_TARGET} STREQUAL "arm32")
     target_compile_options(${SOURCE_EXE} PRIVATE -mfloat-abi=softfp
     -fstack-protector-strong -mthumb
