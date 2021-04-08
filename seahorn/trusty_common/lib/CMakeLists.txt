@@ -2,6 +2,7 @@
 add_library(sea_common_proofs
   handle_table.c
   nondet.c
+  bcmp.c
 )
 
 if(SEA_ALLOCATOR_CAN_FAIL)
