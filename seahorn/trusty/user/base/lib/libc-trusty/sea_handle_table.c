@@ -53,28 +53,6 @@ extern handle_t ND nd_handle(void);
   But for now, prefer simplicity of the representation
  */
 
-// -- number of active port handles
-unsigned g_active_phandles = 0;
-
-// -- port handle 1
-bool g_phandle1_active = false;
-void *g_phandle1_cookie = NULL;
-
-// -- port handle 2
-bool g_phandle2_active = false;
-void *g_phandle2_cookie = NULL;
-
-// -- number of active channel handles
-unsigned g_active_chandles = 0;
-
-// -- channel handle 1
-bool g_chandle16_active = false;
-void *g_chandle16_cookie = false;
-
-// -- channel handle 2
-bool g_chandle17_active = false;
-void *g_chandle17_cookie = false;
-
 /** Convenience macros to access fields.
 
     Only use these macros to access the fields so that the representation can be
@@ -83,6 +61,88 @@ void *g_chandle17_cookie = false;
 
 #define PHANDLE(ID, FLD) g_phandle##ID##_##FLD
 #define CHANDLE(ID, FLD) g_chandle##ID##_##FLD
+
+// -- number of active port handles
+unsigned g_active_phandles = 0;
+
+#define HANDLE_DEF(ID)                                                         \
+  bool PHANDLE(ID, active) = false;                                            \
+  void *PHANDLE(ID, cookie) = NULL;
+
+// -- port handle 1
+HANDLE_DEF(1)
+// -- port handle 2
+HANDLE_DEF(2);
+
+// -- number of active channel handles
+unsigned g_active_chandles = 0;
+
+#define CHAN_DEF(ID)                                                           \
+  bool CHANDLE(ID, active) = false;                                            \
+  void *CHANDLE(ID, cookie) = false;                                           \
+  uint32_t CHANDLE(ID, msg_id) = 0;                                            \
+  size_t CHANDLE(ID, msg_len) = 0;
+
+// -- channel handle 1
+CHAN_DEF(16)
+// -- channel handle 2
+CHAN_DEF(17)
+
+bool sea_ht_has_msg(handle_t chan_handle) {
+#define CASE(X)                                                                \
+  case X:                                                                      \
+    return CHANDLE(X, msg_id) > 0;
+
+  switch (chan_handle) {
+    CASE(16);
+    CASE(17);
+  }
+  return false;
+}
+
+uint32_t sea_ht_get_msg_id(handle_t chan_handle) {
+#define CASE(X)                                                                \
+  case X:                                                                      \
+    return CHANDLE(X, msg_id);
+  switch (chan_handle) {
+    CASE(16);
+    CASE(17);
+  }
+  return 0;
+}
+
+void sea_ht_set_msg_id(handle_t chan_handle, uint32_t id) {
+#define CASE(X)                                                                \
+  case X:                                                                      \
+    CHANDLE(X, msg_id) = id;                                                   \
+    return;
+  switch (chan_handle) {
+    CASE(16);
+    CASE(17);
+  }
+}
+
+size_t sea_ht_get_msg_len(handle_t chan_handle) {
+#define CASE(X)                                                                \
+  case X:                                                                      \
+    return CHANDLE(X, msg_len);
+  switch (chan_handle) {
+    CASE(16);
+    CASE(17);
+  }
+  return 0;
+}
+
+void sea_ht_set_msg_len(handle_t chan_handle, size_t len) {
+#define CASE(X)                                                                \
+  case X:                                                                      \
+    CHANDLE(X, msg_len) = len;                                                 \
+    return;
+  switch (chan_handle) {
+    CASE(16);
+    CASE(17);
+  }
+}
 
 /**
    Returns the first port handle that is not active
@@ -212,7 +272,7 @@ void sea_ht_set_cookie_port(handle_t handle, void *cookie) {
   }
 }
 
-void* sea_ht_get_cookie_port(handle_t handle) {
+void *sea_ht_get_cookie_port(handle_t handle) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     return PHANDLE(X, cookie);
@@ -236,7 +296,7 @@ void sea_ht_set_cookie_channel(handle_t handle, void *cookie) {
   }
 }
 
-void* sea_ht_get_cookie_channel(handle_t handle) {
+void *sea_ht_get_cookie_channel(handle_t handle) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     return CHANDLE(X, cookie);
@@ -248,7 +308,7 @@ void* sea_ht_get_cookie_channel(handle_t handle) {
   return NULL;
 }
 
-void sea_ht_set_cookie(handle_t handle, void* cookie) {
+void sea_ht_set_cookie(handle_t handle, void *cookie) {
   if (IS_PORT_IPC_HANDLE(handle)) {
     sea_ht_set_cookie_port(handle, cookie);
   } else {
@@ -256,7 +316,7 @@ void sea_ht_set_cookie(handle_t handle, void* cookie) {
   }
 }
 
-void* sea_ht_get_cookie(handle_t handle) {
+void *sea_ht_get_cookie(handle_t handle) {
   if (IS_PORT_IPC_HANDLE(handle)) {
     return sea_ht_get_cookie_port(handle);
   } else {
