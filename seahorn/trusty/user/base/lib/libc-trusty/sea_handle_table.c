@@ -4,16 +4,22 @@
 
 /** Global variables that keep current handle information */
 
-#include <stdbool.h>
-#include <trusty_ipc.h>
-
+#include "sea_handle_table.h"
 #include <seahorn/seahorn.h>
 
 #define ND __declspec(noalias)
 extern handle_t ND nd_handle(void);
 
-#define IS_PORT_IPC_HANDLE(h) ((h)&0x2)
-#define IS_CHAN_IPC_HANDLE(h) (!IS_PORT_HANDLE(h))
+// TODO: increase number of handles as needed
+#define PORT_HANDLE_MIN 1
+#define PORT_HANDLE_MAX 2
+
+// TODO: increase number of channels as needed
+#define CHAN_HANDLE_MIN 16
+#define CHAN_HANDLE_MAX 17
+
+#define IS_PORT_IPC_HANDLE(h) (PORT_HANDLE_MIN <= h && h <= PORT_HANDLE_MAX)
+#define IS_CHAN_IPC_HANDLE(h) (!IS_PORT_IPC_HANDLE(h))
 #define IS_SECURE_IPC_HANDLE(h) ((h)&0x1)
 #define IS_NONSECURE_IPC_HANDLE(h) (!IS_SECURE_HANDLE(h))
 
@@ -33,14 +39,6 @@ extern handle_t ND nd_handle(void);
    18 channel handle 3
    19 channel handle 4
  */
-
-// TODO: increase number of handles as needed
-#define PORT_HANDLE_MIN 1
-#define PORT_HANDLE_MAX 2
-
-// TODO: increase number of channels as needed
-#define CHAN_HANDLE_MIN 16
-#define CHAN_HANDLE_MAX 17
 
 /** GLOBALS */
 
@@ -108,7 +106,7 @@ static handle_t s_first_available_port_handle(bool secure) {
 
    The handle is can be reused
  */
-void ht_free(handle_t handle) {
+void sea_ht_free(handle_t handle) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     PHANDLE(X, active) = false;                                                \
@@ -134,7 +132,7 @@ void ht_free(handle_t handle) {
 
    Return INVALID_IPC_HANDLE if no handle is available to be allocated
  */
-handle_t ht_new_port(bool secure) {
+handle_t sea_ht_new_port(bool secure) {
   handle_t h = s_first_available_port_handle(secure);
   if (h != INVALID_IPC_HANDLE)
     g_active_phandles++;
@@ -146,7 +144,7 @@ handle_t ht_new_port(bool secure) {
 
    Blocks if no active handle is available
  */
-handle_t ht_choose_active_handle(void) {
+handle_t sea_ht_choose_active_handle(void) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     assume(PHANDLE(X, active));                                                \
@@ -181,14 +179,16 @@ static handle_t s_first_available_channel_handle(void) {
   return INVALID_IPC_HANDLE;
 }
 
-handle_t ht_new_channel(void) {
+handle_t sea_ht_new_channel(handle_t port) {
+  (void)port;
+
   handle_t h = s_first_available_channel_handle();
   if (h != INVALID_IPC_HANDLE)
     g_active_chandles++;
   return INVALID_IPC_HANDLE;
 }
 
-bool ht_is_active_port(handle_t handle) {
+bool sea_ht_is_active_port(handle_t handle) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     return PHANDLE(X, active);
@@ -200,7 +200,7 @@ bool ht_is_active_port(handle_t handle) {
   return false;
 }
 
-void ht_set_cookie_port(handle_t handle, void *cookie) {
+void sea_ht_set_cookie_port(handle_t handle, void *cookie) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     PHANDLE(X, cookie) = cookie;                                               \
@@ -212,7 +212,7 @@ void ht_set_cookie_port(handle_t handle, void *cookie) {
   }
 }
 
-void *ht_get_cookie_port(handle_t handle) {
+void* sea_ht_get_cookie_port(handle_t handle) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     return PHANDLE(X, cookie);
@@ -224,7 +224,7 @@ void *ht_get_cookie_port(handle_t handle) {
   return NULL;
 }
 
-void ht_set_cookie_channel(handle_t handle, void *cookie) {
+void sea_ht_set_cookie_channel(handle_t handle, void *cookie) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     CHANDLE(X, cookie) = cookie;                                               \
@@ -236,7 +236,7 @@ void ht_set_cookie_channel(handle_t handle, void *cookie) {
   }
 }
 
-void *ht_get_cookie_channel(handle_t handle) {
+void* sea_ht_get_cookie_channel(handle_t handle) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     return CHANDLE(X, cookie);
@@ -246,4 +246,20 @@ void *ht_get_cookie_channel(handle_t handle) {
     CASE(17);
   }
   return NULL;
+}
+
+void sea_ht_set_cookie(handle_t handle, void* cookie) {
+  if (IS_PORT_IPC_HANDLE(handle)) {
+    sea_ht_set_cookie_port(handle, cookie);
+  } else {
+    sea_ht_set_cookie_channel(handle, cookie);
+  }
+}
+
+void* sea_ht_get_cookie(handle_t handle) {
+  if (IS_PORT_IPC_HANDLE(handle)) {
+    return sea_ht_get_cookie_port(handle);
+  } else {
+    return sea_ht_get_cookie_channel(handle);
+  }
 }
