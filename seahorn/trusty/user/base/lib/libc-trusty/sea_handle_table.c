@@ -10,19 +10,6 @@
 #define ND __declspec(noalias)
 extern handle_t ND nd_handle(void);
 
-// TODO: increase number of handles as needed
-#define PORT_HANDLE_MIN 1
-#define PORT_HANDLE_MAX 2
-
-// TODO: increase number of channels as needed
-#define CHAN_HANDLE_MIN 16
-#define CHAN_HANDLE_MAX 17
-
-#define IS_PORT_IPC_HANDLE(h) (PORT_HANDLE_MIN <= h && h <= PORT_HANDLE_MAX)
-#define IS_CHAN_IPC_HANDLE(h) (!IS_PORT_IPC_HANDLE(h))
-#define IS_SECURE_IPC_HANDLE(h) ((h)&0x1)
-#define IS_NONSECURE_IPC_HANDLE(h) (!IS_SECURE_HANDLE(h))
-
 /**
    ID DESCRIPTION
    1  port handle secure 1
@@ -193,10 +180,20 @@ void sea_ht_free(handle_t handle) {
    Return INVALID_IPC_HANDLE if no handle is available to be allocated
  */
 handle_t sea_ht_new_port(bool secure) {
+#define CASE(X)                                                                \
+  case X:                                                                      \
+    PHANDLE(X, active) = true;                                                 \
+    return X;
+
   handle_t h = s_first_available_port_handle(secure);
-  if (h != INVALID_IPC_HANDLE)
-    g_active_phandles++;
-  return h;
+  if (h == INVALID_IPC_HANDLE)
+    return h;
+  g_active_phandles++;
+  switch (h) {
+    CASE(1)
+    CASE(2)
+  }
+  return INVALID_IPC_HANDLE;
 }
 
 /**
@@ -239,12 +236,20 @@ static handle_t s_first_available_channel_handle(void) {
   return INVALID_IPC_HANDLE;
 }
 
-handle_t sea_ht_new_channel(handle_t port) {
-  (void)port;
+handle_t sea_ht_new_channel(handle_t parent_port) {
+#define CASE(X)                                                                \
+  case X:                                                                      \
+    CHANDLE(X, active) = true;                                                 \
+    return X;
 
   handle_t h = s_first_available_channel_handle();
-  if (h != INVALID_IPC_HANDLE)
-    g_active_chandles++;
+  if (h == INVALID_IPC_HANDLE)
+    return h;
+  g_active_chandles++;
+  switch (h) {
+    CASE(16)
+    CASE(17)
+  }
   return INVALID_IPC_HANDLE;
 }
 

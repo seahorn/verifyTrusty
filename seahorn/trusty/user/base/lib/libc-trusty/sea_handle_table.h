@@ -4,6 +4,20 @@
 #include <stdbool.h>
 #include <trusty_ipc.h>
 
+// TODO: increase number of handles as needed
+#define PORT_HANDLE_MIN 1
+#define PORT_HANDLE_MAX 2
+
+// TODO: increase number of channels as needed
+#define CHAN_HANDLE_MIN 16
+#define CHAN_HANDLE_MAX 17
+
+#define IS_PORT_IPC_HANDLE(h) (PORT_HANDLE_MIN <= h && h <= PORT_HANDLE_MAX)
+#define IS_CHAN_IPC_HANDLE(h) (!IS_PORT_IPC_HANDLE(h))
+#define IS_SECURE_IPC_HANDLE(h) ((h)&0x1)
+#define IS_NONSECURE_IPC_HANDLE(h) (!IS_SECURE_HANDLE(h))
+
+
 handle_t sea_ht_new_port(bool secure);
 handle_t sea_ht_new_channel(handle_t port);
 
