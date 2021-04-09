@@ -150,7 +150,7 @@ ssize_t _trusty_send_msg(handle_t handle, struct ipc_msg *msg) {
     return err;
 
   sassert(1 <= msg->num_iov);
-  sassert(msg->num_iov >= 2);
+  sassert(msg->num_iov <= 2);
 
   switch(msg->num_iov) {
   case 1:
