@@ -17,6 +17,7 @@
 #define IS_SECURE_IPC_HANDLE(h) ((h)&0x1)
 #define IS_NONSECURE_IPC_HANDLE(h) (!IS_SECURE_HANDLE(h))
 
+#define INVALID_IPC_MSG_ID 0
 
 handle_t sea_ht_new_port(bool secure);
 handle_t sea_ht_new_channel(handle_t port);
@@ -41,4 +42,5 @@ uint32_t sea_ht_get_msg_id(handle_t chan_handle);
 void sea_ht_set_msg_id(handle_t chan_handle, uint32_t id);
 size_t sea_ht_get_msg_len(handle_t chan_handle);
 void sea_ht_set_msg_len(handle_t chan_handle, size_t len);
+void sea_ht_new_nd_msg(handle_t chan_handle);
 #endif

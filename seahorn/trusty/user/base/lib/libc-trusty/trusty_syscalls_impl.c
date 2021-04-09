@@ -21,6 +21,7 @@ handle_t _trusty_port_create(const char *path, uint32_t num_recv_bufs,
 }
 
 handle_t _trusty_connect(const char *path, uint32_t flags) {
+  // not implemented
   return INVALID_IPC_HANDLE;
 }
 
@@ -56,53 +57,52 @@ int _trusty_handle_set_ctrl(handle_t handle, uint32_t cmd, struct uevent *evt) {
   return ERR_GENERIC;
 }
 
-extern uint32_t ND nd_msg_id(void);
-extern size_t ND nd_msg_len(void);
-
-#define MAX_MSG_LENGTH 4096
-
-extern int ND nd_trusty_err(void);
-
-extern uint32_t nd_trusty_event(void);
+extern int ND nd_trusty_ipc_err(void);
+extern uint32_t nd_trusty_ipc_event(void);
 
 int _trusty_wait(handle_t handle, struct uevent *event,
                  uint32_t timeout_msecs) {
-  int err = nd_trusty_err();
+  int err = nd_trusty_ipc_err();
   if (err < NO_ERROR)
     return err;
 
   event->handle = handle;
   event->cookie = sea_ht_get_cookie(handle);
-  event->event = nd_trusty_event();
+  event->event = nd_trusty_ipc_event();
 
-  /** TODO: register a new message with handle if necessary */
+  if (event->event & IPC_HANDLE_POLL_MSG) {
+    sea_ht_new_nd_msg(handle);
+  }
+
   return NO_ERROR;
 }
 
 int _trusty_wait_any(uevent_t *ev, uint32_t timeout_msecs) {
-  int err = nd_trusty_err();
+  int err = nd_trusty_ipc_err();
   if (err < NO_ERROR)
     return err;
 
   handle_t h = sea_ht_choose_active_handle();
   ev->handle = h;
   ev->cookie = sea_ht_get_cookie(h);
-  ev->event = nd_trusty_event();
+  ev->event = nd_trusty_ipc_event();
 
-  /** TODO: register a new message with handle if necessary */
+  if (ev->event & IPC_HANDLE_POLL_MSG) {
+    sea_ht_new_nd_msg(h);
+  }
 
   return NO_ERROR;
 }
 
 int _trusty_get_msg(handle_t handle, struct ipc_msg_info *msg_info) {
-  int err = nd_trusty_err();
+  int err = nd_trusty_ipc_err();
   if (err < NO_ERROR)
     return err;
 
   msg_info->id = sea_ht_get_msg_id(handle);
   msg_info->len = sea_ht_get_msg_len(handle);
 
-  return msg_info->id > 0 ? NO_ERROR : ERR_GENERIC;
+  return msg_info->id != INVALID_IPC_MSG_ID ? NO_ERROR : ERR_GENERIC;
 }
 
 ssize_t _trusty_read_msg(handle_t handle, uint32_t msg_id, uint32_t offset,
@@ -141,18 +141,22 @@ ssize_t _trusty_read_msg(handle_t handle, uint32_t msg_id, uint32_t offset,
 }
 
 int _trusty_put_msg(handle_t handle, uint32_t msg_id) {
-  sea_ht_set_msg_id(handle, 0);
+  int err = nd_trusty_ipc_err();
+  if (err < NO_ERROR)
+    return err;
+
+  sea_ht_set_msg_id(handle, INVALID_IPC_MSG_ID);
   return NO_ERROR;
 }
 ssize_t _trusty_send_msg(handle_t handle, struct ipc_msg *msg) {
-  int err = nd_trusty_err();
+  int err = nd_trusty_ipc_err();
   if (err < NO_ERROR)
     return err;
 
   sassert(1 <= msg->num_iov);
   sassert(msg->num_iov <= 2);
 
-  switch(msg->num_iov) {
+  switch (msg->num_iov) {
   case 1:
     return msg->iov[0].iov_len;
   case 2:

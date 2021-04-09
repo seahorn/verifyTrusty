@@ -131,6 +131,22 @@ void sea_ht_set_msg_len(handle_t chan_handle, size_t len) {
   }
 }
 
+extern ND size_t nd_msg_len(void);
+extern ND uint32_t nd_msg_id(void);
+void sea_ht_new_nd_msg(handle_t chan_handle) {
+#define CASE(X)                                                                \
+  case X:                                                                      \
+    CHANDLE(X, msg_len) = nd_msg_len();                                        \
+    CHANDLE(X, msg_id) = nd_msg_id();                                          \
+    assume(CHANDLE(X, msg_id) > INVALID_IPC_MSG_ID);                           \
+    return;
+
+  switch (chan_handle) {
+    CASE(16);
+    CASE(17);
+  }
+}
+
 /**
    Returns the first port handle that is not active
 
