@@ -6,6 +6,7 @@
 
 #include "sea_handle_table.h"
 #include <seahorn/seahorn.h>
+#include <string.h>
 
 #define ND __declspec(noalias)
 extern handle_t ND nd_handle(void);
@@ -54,7 +55,8 @@ unsigned g_active_phandles = 0;
 
 #define HANDLE_DEF(ID)                                                         \
   bool PHANDLE(ID, active) = false;                                            \
-  void *PHANDLE(ID, cookie) = NULL;
+  void *PHANDLE(ID, cookie) = NULL;                                            \
+  const char *PHANDLE(ID, path) = NULL;
 
 // -- port handle 1
 HANDLE_DEF(1)
@@ -195,10 +197,11 @@ void sea_ht_free(handle_t handle) {
 
    Return INVALID_IPC_HANDLE if no handle is available to be allocated
  */
-handle_t sea_ht_new_port(bool secure) {
+handle_t sea_ht_new_port(bool secure, const char *path) {
 #define CASE(X)                                                                \
   case X:                                                                      \
     PHANDLE(X, active) = true;                                                 \
+    PHANDLE(X, path) = path;                                                   \
     return X;
 
   handle_t h = s_first_available_port_handle(secure);
@@ -209,6 +212,15 @@ handle_t sea_ht_new_port(bool secure) {
     CASE(1)
     CASE(2)
   }
+  return INVALID_IPC_HANDLE;
+}
+
+handle_t sea_ht_math_port(const char *path) {
+#define CASE(X)                                                                \
+  if ((strcmp(PHANDLE(X, path), path) == 0) && PHANDLE(X, active))             \
+    return X;
+  CASE(1);
+  CASE(2);
   return INVALID_IPC_HANDLE;
 }
 
