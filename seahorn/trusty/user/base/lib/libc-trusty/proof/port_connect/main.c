@@ -1,6 +1,18 @@
 #include <seahorn/seahorn.h>
 #include <trusty_ipc.h>
 #include <uapi/err.h>
+/* Documentation from trusty API:
+  connect()
+Initiates a connection to a port specified by name.
+
+long connect(const char *path, uint flags);
+
+[in] path: Name of a port published by a Trusty application
+[in] flags: Specifies additional, optional behavior
+
+[retval]: Handle to a channel over which messages can be exchanged 
+with the server; error if negative
+*/
 
 int main(void) {
 
@@ -20,12 +32,12 @@ int main(void) {
   handle_t rc;
 
   rc = connect("ta.seahorn.com", IPC_CONNECT_ASYNC | IPC_CONNECT_WAIT_FOR_PORT);
-  // expect invalid connection
-  sassert(rc == -1);
+  // expect valid connection
+  sassert(rc > 0);
 
   rc = connect("ns.seahorn.com", IPC_CONNECT_ASYNC | IPC_CONNECT_WAIT_FOR_PORT);
-  // expect invalid connection
-  sassert(rc == -1);
+  // expect valid connection
+  sassert(rc > 0);
 
   return 0;
 }
