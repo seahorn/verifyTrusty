@@ -17,11 +17,15 @@ handle_t _trusty_port_create(const char *path, uint32_t num_recv_bufs,
 
   bool secure = (flags & IPC_PORT_ALLOW_NS_CONNECT) &&
                 !(flags & IPC_PORT_ALLOW_TA_CONNECT);
-  return sea_ht_new_port(secure);
+  return sea_ht_new_port(secure, path);
 }
 
 handle_t _trusty_connect(const char *path, uint32_t flags) {
-  // not implemented
+  handle_t port_handle = sea_ht_math_port(path);
+  if (port_handle != INVALID_IPC_HANDLE) {
+    handle_t chan = sea_ht_new_channel(port_handle);
+    return chan;
+  }
   return INVALID_IPC_HANDLE;
 }
 
@@ -33,10 +37,18 @@ handle_t _trusty_accept(handle_t port_handle, uuid_t *peer_uuid) {
   (void)port_handle;
   handle_t chan = sea_ht_new_channel(port_handle);
   if (chan != INVALID_IPC_HANDLE) {
-    // define peer_uuid to a dummy value
-    peer_uuid->time_low = nd_time_low();
-    peer_uuid->time_mid = nd_time_mid();
-    peer_uuid->time_hi_and_version = nd_time_hi_n_ver();
+    if ((port_handle & IPC_PORT_ALLOW_TA_CONNECT) == 0) {
+      // non-secure world
+      peer_uuid->time_low = 0;
+      peer_uuid->time_mid = 0;
+      peer_uuid->time_hi_and_version = 0;
+    }
+    else {
+      // define peer_uuid to a dummy value
+      peer_uuid->time_low = nd_time_low();
+      peer_uuid->time_mid = nd_time_mid();
+      peer_uuid->time_hi_and_version = nd_time_hi_n_ver();
+    }
   }
   return chan;
 }

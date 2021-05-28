@@ -19,7 +19,7 @@
 
 #define INVALID_IPC_MSG_ID 0
 
-handle_t sea_ht_new_port(bool secure);
+handle_t sea_ht_new_port(bool secure, const char *path);
 handle_t sea_ht_new_channel(handle_t port);
 
 handle_t sea_ht_choose_active_handle(void);
@@ -43,4 +43,6 @@ void sea_ht_set_msg_id(handle_t chan_handle, uint32_t id);
 size_t sea_ht_get_msg_len(handle_t chan_handle);
 void sea_ht_set_msg_len(handle_t chan_handle, size_t len);
 void sea_ht_new_nd_msg(handle_t chan_handle);
+
+handle_t sea_ht_math_port(const char *path);
 #endif
