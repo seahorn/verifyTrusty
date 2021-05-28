@@ -27,5 +27,9 @@ jobs:
       - name: Docker 
         run: docker build -t verify-trusty . --file docker/seahorn-dev10-verify-trusty.Dockerfile
       
+      - name: Get number of Cores
+        id: cores
+        run: echo "::set-output name=num_cores::$(nproc --all)"
+      
       - name: Run Tests 
-        run: docker run -t verify-trusty /bin/bash -c "cd build && mkdir -p /tmp/verifyTrusty && env VERIFY_FLAGS=\"${{ matrix.verify_flag }}\" ctest --output-on-failure --timeout 2000 ."
+        run: docker run -t verify-trusty /bin/bash -c "cd build && mkdir -p /tmp/verifyTrusty && env VERIFY_FLAGS=\"${{ matrix.verify_flag }}\" ctest -j ${{steps.cores.outputs.num_cores}} --output-on-failure --timeout 2000 ."
