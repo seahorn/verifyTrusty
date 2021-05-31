@@ -5,4 +5,16 @@
 
 
 ssize_t send_msg(handle_t handle, struct ipc_msg *msg);
-int msg_send_called;
+
+typedef struct State{
+    int msg_send_called;
+    int msg_recv_called;
+} state;
+
+state g_state;
+
+void state_init(void);
+void msg_sent(void);
+void msg_received(void);
+void state_reset(void);
+int get_msg_sent_times(void);

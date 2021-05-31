@@ -10,6 +10,26 @@
 extern int nd_size_t(void);
 extern int msg_send_called;
 
+void state_init(void)
+{
+    g_state.msg_recv_called = 0;
+    g_state.msg_send_called = 0;
+}
+void msg_sent(void){
+    g_state.msg_send_called += 1;
+}
+void msg_received(void){
+    g_state.msg_recv_called += 1;
+}
+void state_reset(void){
+    g_state.msg_recv_called = 0;
+    g_state.msg_send_called = 0;
+}
+
+int get_msg_sent_times(void){
+    return g_state.msg_send_called;
+}
+
 handle_t port_create(const char* path,
                      uint32_t num_recv_bufs,
                      uint32_t recv_buf_size,
@@ -67,6 +87,7 @@ int put_msg(handle_t handle, uint32_t msg_id) {
 }
 
 ssize_t send_msg(handle_t handle, struct ipc_msg* msg) {
-    msg_send_called = 1;
+    msg_sent();
     return nd_size_t();
 }
+
