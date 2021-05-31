@@ -30,6 +30,7 @@ int main(void) {
   handle_t rc;
 
   rc = set_cookie(port, &port_evt_handler);
+  sassert(rc == 0);
 
   event.handle = INVALID_IPC_HANDLE;
   event.event = 0;

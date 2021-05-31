@@ -15,6 +15,8 @@ handle_t _trusty_port_create(const char *path, uint32_t num_recv_bufs,
   (void)num_recv_bufs;
   (void)recv_buf_size;
 
+  if (!path) return ERR_BAD_PATH;
+
   bool secure = (flags & IPC_PORT_ALLOW_NS_CONNECT) &&
                 !(flags & IPC_PORT_ALLOW_TA_CONNECT);
   return sea_ht_new_port(secure, path);
