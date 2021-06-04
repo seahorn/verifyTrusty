@@ -226,12 +226,12 @@ function(sea_get_file_name VAR LLVMIR_TARGET)
 endfunction()
 
 function(sea_attach_bc_link name)
-  sea_link_libraries(${name} sea_common_proofs.ir)
+  sea_link_libraries(${name} sea_libc_trusty.ir)
   sea_attach_bc(${name})
 endfunction()
 
 function(sea_attach_bc_cc_link name)
-  sea_link_libraries(${name} sea_common_proofs.ir)
+  sea_link_libraries(${name} sea_libc_trusty.ir)
   sea_attach_bc_cc(${name})
 endfunction()
 

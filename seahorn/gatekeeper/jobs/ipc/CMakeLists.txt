@@ -11,7 +11,7 @@ target_include_directories(gatekeeper_ipc PRIVATE
   ${TRUSTY_ROOT}/system/gatekeeper/include)
 
 sea_link_libraries(gatekeeper_ipc gatekeeper_ipc_lib.opt.ir)
-sea_overlink_libraries(gatekeeper_ipc trusty_api_override.ir)
+# sea_overlink_libraries(gatekeeper_ipc trusty_api_override.ir)
 sea_overlink_libraries(gatekeeper_ipc realloc_override.ir)
 sea_overlink_libraries(gatekeeper_ipc fprintf_override.ir)
 sea_overlink_libraries(gatekeeper_ipc time_override.ir)
