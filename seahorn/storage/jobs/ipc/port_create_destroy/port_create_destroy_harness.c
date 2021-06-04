@@ -7,7 +7,8 @@
 
 #include "ipc.h"
 
-#include "handle_table.h"
+// #include "handle_table.h"
+#include "sea_handle_table.h"
 #include "seahorn/seahorn.h"
 #include "sea_ipc_helper.h"
 
@@ -17,7 +18,7 @@
 /** Test harness entry point */
 int main(void) {
   /* initialize handle table */
-  handle_table_init(INVALID_IPC_HANDLE, INVALID_IPC_HANDLE, INVALID_IPC_HANDLE);
+  // handle_table_init(INVALID_IPC_HANDLE, INVALID_IPC_HANDLE, INVALID_IPC_HANDLE);
 
   /*  setup port context */
   struct ipc_port_context* ctx = create_port_context();
@@ -33,7 +34,7 @@ int main(void) {
   }
 
   /*  check that handle is registered if connection succeeds */
-  sassert(contains_handle(ctx->common.handle));
+  sassert(sea_ht_is_active_port(ctx->common.handle));
 
   // ipc_loop();
 
@@ -41,7 +42,7 @@ int main(void) {
   ipc_port_destroy(ctx);
 
   /*  check that handle is unregistered properly */
-  sassert(!contains_handle(ctx->common.handle));
+  sassert(!sea_ht_is_active_port(ctx->common.handle));
 
   return 0;
 }
