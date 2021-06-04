@@ -3,6 +3,7 @@
 #include <trusty_ipc.h>
 #include <seahorn/seahorn.h>
 #include <uapi/err.h>
+#include <ipc.h>
 
 void sea_dispatch_event(const uevent_t* ev) {
     sassert(ev);
@@ -42,6 +43,29 @@ static int sea_ipc_msg_handler(struct ipc_channel_context *context, void *msg,
   return NO_ERROR;
 }
 
+static int sync_ipc_msg_handler(struct ipc_channel_context *context, void *msg,
+                               size_t msg_size) {
+    uint8_t* snd_buf = malloc(sizeof(msg_size));
+    uint8_t* recv_buf = malloc(sizeof(msg_size));
+    struct iovec tx_iov = {
+            .iov_base = snd_buf,
+            .iov_len = msg_size,
+    };
+    struct iovec rx_iov = {
+            .iov_base = recv_buf,
+            .iov_len = msg_size,
+    };
+    
+    handle_t rc = sync_ipc_send_msg(context->common.handle, &tx_iov, 1, &rx_iov, 1);
+    
+    if (rc < 0)
+      return rc;
+    
+    if (rc > 0) sassert(rc == msg_size);
+
+    return NO_ERROR;
+}
+
 /*
  * directly return a channel context given uuid and chan handle
  */
@@ -51,6 +75,18 @@ sea_channel_connect(struct ipc_port_context *parent_ctx,
   struct ipc_channel_context *pctx = malloc(sizeof(struct ipc_channel_context));
   pctx->ops.on_disconnect = sea_ipc_disconnect_handler;
   pctx->ops.on_handle_msg = sea_ipc_msg_handler;
+  return pctx;
+}
+
+/*
+ * directly return a channel context given uuid and chan handle
+ */
+struct ipc_channel_context *
+sea_sync_channel_connect(struct ipc_port_context *parent_ctx,
+                    const uuid_t *peer_uuid, handle_t chan_handle) {
+  struct ipc_channel_context *pctx = malloc(sizeof(struct ipc_channel_context));
+  pctx->ops.on_disconnect = sea_ipc_disconnect_handler;
+  pctx->ops.on_handle_msg = sync_ipc_msg_handler;
   return pctx;
 }
 
