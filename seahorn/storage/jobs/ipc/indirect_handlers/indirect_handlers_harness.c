@@ -34,7 +34,7 @@
    entry point
 */
 int main(void) {
-  handle_table_init(INVALID_IPC_HANDLE, INVALID_IPC_HANDLE, INVALID_IPC_HANDLE);
+  // handle_table_init(INVALID_IPC_HANDLE, INVALID_IPC_HANDLE, INVALID_IPC_HANDLE);
   struct ipc_port_context* ctx = create_port_context();
   int rc =
       ipc_port_create(ctx, STORAGE_DISK_PROXY_PORT, 1, STORAGE_MAX_BUFFER_SIZE,

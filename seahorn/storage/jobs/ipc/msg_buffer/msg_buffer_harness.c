@@ -18,10 +18,13 @@
    verification entry point
  */
 int main(void) {
-  handle_table_init(INVALID_IPC_HANDLE, INVALID_IPC_HANDLE, INVALID_IPC_HANDLE);
-  struct ipc_port_context* ctx = create_port_context();
+  // handle_table_init(INVALID_IPC_HANDLE, INVALID_IPC_HANDLE, INVALID_IPC_HANDLE);
+  struct ipc_port_context ctx = {
+      .ops = {.on_connect = sea_sync_channel_connect},
+  };
+  // struct ipc_port_context* ctx = create_sync_port_context();
   int rc =
-      ipc_port_create(ctx, STORAGE_DISK_PROXY_PORT, 1, STORAGE_MAX_BUFFER_SIZE,
+      ipc_port_create(&ctx, STORAGE_DISK_PROXY_PORT, 1, STORAGE_MAX_BUFFER_SIZE,
                       IPC_PORT_ALLOW_TA_CONNECT | IPC_PORT_ALLOW_NS_CONNECT);
 
   if (rc < 0) {
@@ -30,7 +33,7 @@ int main(void) {
 
   ipc_loop();
 
-  ipc_port_destroy(ctx);
+  ipc_port_destroy(&ctx);
 
   return 0;
 }
