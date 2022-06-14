@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.18.4)
 project(verifyTrusty C CXX)
 
-string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvmir)
 include(LLVMIRUtil)
@@ -27,10 +26,14 @@ set(LLVMIR_LINK ${SEA_LINK})
 set(SEA_OPT "${SEAHORN_ROOT}/bin/seaopt" CACHE STRING  "Path to seaopt binary")
 set(SEA_PP "${SEAHORN_ROOT}/bin/seapp" CACHE STRING  "Path to seapp binary")
 set(LLVMIR_OPT ${SEA_OPT})
+set(CPPSTDLIB "libc++" CACHE STRING "C++ std library to use")
 
 set(TRUSTY_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/trusty)
 set(TRUSTY_TARGET "arm32" CACHE STRING "Trusty target for verification")
 set(EXTERNAL_ROOT ${TRUSTY_ROOT}/external)
+
+# set C++ stdlib
+string(APPEND CMAKE_CXX_FLAGS " -stdlib=${CPPSTDLIB}")
 
 # Set gcc-toolchain directory
 if (${TRUSTY_TARGET} STREQUAL "arm32")
