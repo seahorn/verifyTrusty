@@ -29,6 +29,11 @@ RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
 RUN apt -y update
 RUN apt -y install cmake
 
+# install 32-bit versions of needed libraries
+RUN dpkg --add-architecture i386
+RUN apt-get -y update
+RUN apt-get -y install gcc-multilib g++-multilib libssl-dev:i386
+
 ## install pyyaml parser
 RUN pip3 install setuptools --upgrade && \
     pip3 install pyyaml 
