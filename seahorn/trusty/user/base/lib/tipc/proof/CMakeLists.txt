@@ -1,0 +1,2 @@
+add_subdirectory(tipc_connect)
+add_subdirectory(tipc_send1)
