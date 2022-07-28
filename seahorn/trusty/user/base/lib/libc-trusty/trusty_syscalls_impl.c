@@ -1,7 +1,7 @@
 #include "sea_handle_table.h"
 #include "trusty_syscalls.h"
 
-#include <uapi/err.h> // trusty errors definitions
+#include "uapi/err.h" // trusty errors definitions
 
 #include <seahorn/seahorn.h>
 

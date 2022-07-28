@@ -1,9 +1,9 @@
 #include <seahorn/seahorn.h>
-#include <trusty_ipc.h>
-#include <uapi/err.h>
+#include "trusty_ipc.h"
+#include "uapi/err.h"
 /* Documentation from trusty API:
   read_msg()
-Reads the content of the message with the specified ID starting from the 
+Reads the content of the message with the specified ID starting from the
 specified offset.
 
 long read_msg(uint32_t handle, uint32_t msg_id, uint32_t offset, ipc_msg_t
@@ -11,10 +11,10 @@ long read_msg(uint32_t handle, uint32_t msg_id, uint32_t offset, ipc_msg_t
 [in] handle: Handle of the channel from which to read the message.
 [in] msg_id: ID of the message to read.
 [in] offset: Offset into the message from which to start reading.
-[in] msg: Pointer to the ipc_msg_t structure describing a set of buffers into 
+[in] msg: Pointer to the ipc_msg_t structure describing a set of buffers into
 which to store incoming message data.
 
-[retval]: Total number of bytes stored in the dst buffers on success; 
+[retval]: Total number of bytes stored in the dst buffers on success;
 a negative error otherwise.
 */
 

@@ -1,6 +1,7 @@
 add_executable(storage_ipc_indirect_handlers
-  ${TRUSTY_ROOT}/trusty/user/app/storage/ipc.c
+  ${IPC_SRC}
   indirect_handlers_harness.c)
+
 target_include_directories(storage_ipc_indirect_handlers 
   PRIVATE ${TRUSTY_ROOT}/trusty/user/app/storage
   )

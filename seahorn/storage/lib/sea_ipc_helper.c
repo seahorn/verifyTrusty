@@ -45,25 +45,26 @@ static int sea_ipc_msg_handler(struct ipc_channel_context *context, void *msg,
 
 static int sync_ipc_msg_handler(struct ipc_channel_context *context, void *msg,
                                size_t msg_size) {
-    uint8_t* snd_buf = malloc(sizeof(msg_size));
-    uint8_t* recv_buf = malloc(sizeof(msg_size));
-    struct iovec tx_iov = {
-            .iov_base = snd_buf,
-            .iov_len = msg_size,
-    };
-    struct iovec rx_iov = {
-            .iov_base = recv_buf,
-            .iov_len = msg_size,
-    };
-    
-    handle_t rc = sync_ipc_send_msg(context->common.handle, &tx_iov, 1, &rx_iov, 1);
-    
-    if (rc < 0)
-      return rc;
-    
-    if (rc > 0) sassert(rc == msg_size);
+  uint8_t *snd_buf = malloc(sizeof(msg_size));
+  uint8_t *recv_buf = malloc(sizeof(msg_size));
+  struct iovec tx_iov = {
+      .iov_base = snd_buf,
+      .iov_len = msg_size,
+  };
+  struct iovec rx_iov = {
+      .iov_base = recv_buf,
+      .iov_len = msg_size,
+  };
 
-    return NO_ERROR;
+  int rc = sync_ipc_send_msg(context->common.handle, &tx_iov, 1, &rx_iov, 1);
+
+  if (rc < 0)
+    return rc;
+
+  if (rc > 0)
+    sassert(rc == msg_size);
+
+  return NO_ERROR;
 }
 
 /*

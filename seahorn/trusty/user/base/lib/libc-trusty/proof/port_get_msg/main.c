@@ -1,6 +1,6 @@
 #include <seahorn/seahorn.h>
-#include <trusty_ipc.h>
-#include <uapi/err.h>
+#include "trusty_ipc.h"
+#include "uapi/err.h"
 /* Documentation from trusty API:
   get_msg()
 Gets meta-information about the next message in an incoming message queue
@@ -13,10 +13,11 @@ typedef struct ipc_msg_info {
         size_t    len;
         uint32_t  id;
 } ipc_msg_info_t;
-Each message is assigned a unique ID across the set of outstanding messages, 
-and the total length of each message is filled in. 
-If configured and allowed by the protocol, 
-there can be multiple outstanding (opened) messages at once for a particular channel.
+Each message is assigned a unique ID across the set of outstanding messages,
+and the total length of each message is filled in.
+If configured and allowed by the protocol,
+there can be multiple outstanding (opened) messages at once for a particular
+channel.
 
 [retval]: NO_ERROR on success; a negative error otherwise
 */

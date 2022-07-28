@@ -1,6 +1,6 @@
 #include <seahorn/seahorn.h>
-#include <trusty_ipc.h>
-#include <uapi/err.h>
+#include "trusty_ipc.h"
+#include "uapi/err.h"
 /* Documentation from trusty API:
   send_msg()
 Sends a message over a specified channel.

@@ -1,6 +1,7 @@
 add_executable(storage_ipc_msg_buffer
-  ${TRUSTY_ROOT}/trusty/user/app/storage/ipc.c
+  ${IPC_SRC}
   msg_buffer_harness.c)
+
 target_include_directories(storage_ipc_msg_buffer 
   PRIVATE ${TRUSTY_ROOT}/trusty/user/app/storage
   )
