@@ -1,5 +1,5 @@
 #include <seahorn/seahorn.h>
-#include <trusty_ipc.h>
+#include "trusty_ipc.h"
 
 int main(void) {
 

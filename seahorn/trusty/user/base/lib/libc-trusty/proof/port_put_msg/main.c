@@ -1,6 +1,6 @@
 #include <seahorn/seahorn.h>
-#include <trusty_ipc.h>
-#include <uapi/err.h>
+#include "trusty_ipc.h"
+#include "uapi/err.h"
 /* Documentation from trusty API:
   put_msg()
 Retires a message with a specified ID.

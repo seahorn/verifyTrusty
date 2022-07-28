@@ -1,6 +1,6 @@
 #include <seahorn/seahorn.h>
-#include <trusty_ipc.h>
-#include <uapi/err.h>
+#include "trusty_ipc.h"
+#include "uapi/err.h"
 
 int main(void) {
 

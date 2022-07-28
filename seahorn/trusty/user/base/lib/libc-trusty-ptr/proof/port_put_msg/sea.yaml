@@ -1,0 +1,3 @@
+verify_options:
+  # stack allocation from a symbolic starting point
+  horn-explicit-sp0: true

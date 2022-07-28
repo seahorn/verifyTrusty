@@ -29,9 +29,10 @@ set(LLVMIR_OPT ${SEA_OPT})
 set(CPPSTDLIB "libc++" CACHE STRING "C++ std library to use")
 
 set(TRUSTY_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/trusty)
+set(TRUSTY_MOD_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/trusty_mod)
 set(TRUSTY_TARGET "arm32" CACHE STRING "Trusty target for verification")
 set(EXTERNAL_ROOT ${TRUSTY_ROOT}/external)
-
+option(HANDLE_TYPE_IS_PTR "Build SHADOW MEM versions of jobs" OFF)
 # set C++ stdlib
 string(APPEND CMAKE_CXX_FLAGS " -stdlib=${CPPSTDLIB}")
 
@@ -53,8 +54,14 @@ set(VERIFY_CMD ${CMAKE_CURRENT_BINARY_DIR}/verify)
 include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 include_directories(seahorn/trusty_common/include)
-include_directories(seahorn/trusty/user/base/lib/libc-trusty)
-
+# TODO: Don't include at global level
+# I don't get why we have two directories trusty_common and trusty
+# and why is trusty included as an implicit dep of trusty_common
+if (HANDLE_TYPE_IS_PTR)
+  include_directories(seahorn/trusty/user/base/lib/libc-trusty-ptr)
+else ()
+  include_directories(seahorn/trusty/user/base/lib/libc-trusty)
+endif ()
 # Include header's directories
 include_directories(${TRUSTY_ROOT}/hardware/libhardware/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/storage/include)
@@ -63,7 +70,11 @@ include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/keymaster/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/hwkey/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/include/uapi)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/include/shared)
-include_directories(${TRUSTY_ROOT}/trusty/user/base/include/user)
+if (HANDLE_TYPE_IS_PTR)
+  include_directories(${TRUSTY_MOD_ROOT}/trusty/user/base/include/user)
+else ()
+  include_directories(${TRUSTY_ROOT}/trusty/user/base/include/user)
+endif ()
 include_directories(${TRUSTY_ROOT}/trusty/user/base/lib/libc-trusty/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/lib/libstdc++-trusty/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/lib/libcxxabi-trusty/include)

@@ -1,17 +1,15 @@
 #include <seahorn/seahorn.h>
-#include <trusty_ipc.h>
-#include <uapi/err.h>
+#include "trusty_ipc.h"
+#include "uapi/err.h"
 
-typedef void (*event_handler_proc_t)(const uevent_t* ev, void* ctx);
+typedef void (*event_handler_proc_t)(const uevent_t *ev, void *ctx);
 
 struct ipc_event_handler {
-    event_handler_proc_t proc;
-    void* priv;
+  event_handler_proc_t proc;
+  void *priv;
 };
 
-void port_handler(const uevent_t* ev, void* ctx) {
-  return;
-}
+void port_handler(const uevent_t *ev, void *ctx) { return; }
 
 static struct ipc_event_handler port_evt_handler = {
   .proc = port_handler,

@@ -1,0 +1,7 @@
+storage_ipc_indirect_handlers_unsat_test
+storage_ipc_msg_buffer_unsat_test
+gatekeeper_ipc_unsat_test
+# following tracked in https://github.com/seahorn/verifyTrusty/issues/18
+storage_ipc_port_create_destroy_unsat_test
+# following tracked in https://github.com/seahorn/verifyTrusty/issues/19
+port_send_msg_pf_unsat_test

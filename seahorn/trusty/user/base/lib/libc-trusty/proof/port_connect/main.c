@@ -1,6 +1,6 @@
 #include <seahorn/seahorn.h>
-#include <trusty_ipc.h>
-#include <uapi/err.h>
+#include "trusty_ipc.h"
+#include "uapi/err.h"
 /* Documentation from trusty API:
   connect()
 Initiates a connection to a port specified by name.
@@ -10,7 +10,7 @@ long connect(const char *path, uint flags);
 [in] path: Name of a port published by a Trusty application
 [in] flags: Specifies additional, optional behavior
 
-[retval]: Handle to a channel over which messages can be exchanged 
+[retval]: Handle to a channel over which messages can be exchanged
 with the server; error if negative
 */
 

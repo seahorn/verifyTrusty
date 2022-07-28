@@ -10,7 +10,7 @@
 #include "tipc_limits.h"
 #include <interface/storage/storage.h>
 
-#include "handle_table.h"
+#include <sea_handle_table.h>
 #include "seahorn/seahorn.h"
 #include "sea_ipc_helper.h"
 
@@ -30,7 +30,9 @@ int main(void) {
   if (rc < 0) {
     return rc;
   }
-
+#if HANDLE_TYPE_IS_PTR
+  on_waitany_return(ctx.common.handle);
+#endif
   ipc_loop();
 
   ipc_port_destroy(&ctx);

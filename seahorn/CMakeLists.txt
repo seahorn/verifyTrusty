@@ -169,20 +169,24 @@ function(sea_attach_bc name)
   target_compile_options(${SOURCE_EXE} PUBLIC -O1 -Xclang -disable-llvm-optzns -S)
   target_compile_options(${SOURCE_EXE} PUBLIC -Wno-macro-redefined)
   target_compile_options(${SOURCE_EXE} PUBLIC -g)
+  target_compile_options(${SOURCE_EXE} PUBLIC -Werror)  # warnings are errors
   target_compile_options(${SOURCE_EXE} PUBLIC -fdeclspec)
   target_compile_options(${SOURCE_EXE} PUBLIC -Wstrict-prototypes -Wwrite-strings)
 
+  #if (HANDLE_TYPE_IS_PTR)
+  #  target_compile_options(${SOURCE_EXE} PUBLIC -m32)  # use 32-bit ptr for x86_64 arch. See https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html.
+  #endif()
   # work-around for Mac
   if (NOT APPLE)
     target_compile_options(${SOURCE_EXE} PUBLIC -target ${TARGET_ARCH}-linux-gnu)
-  endif()
+  endif ()
 
   if (${TRUSTY_TARGET} STREQUAL "arm32")
     target_compile_options(${SOURCE_EXE} PRIVATE -mfloat-abi=softfp
-    -fstack-protector-strong -mthumb
-    )
+      -fstack-protector-strong -mthumb
+      )
     target_compile_definitions(${SOURCE_EXE} PRIVATE __thumb__)
-  elseif(${TRUSTY_TARGET} STREQUAL "x86_64")
+  elseif (${TRUSTY_TARGET} STREQUAL "x86_64")
     target_compile_options(${SOURCE_EXE} PRIVATE -mcmodel=kernel -mno-red-zone -msoft-float
     -fno-pic -ffunction-sections -fdata-sections -fno-stack-protector -fasynchronous-unwind-tables )
   else ()
@@ -265,5 +269,9 @@ add_subdirectory(trusty_common)
 add_subdirectory(trusty)
 
 add_subdirectory(storage)
-add_subdirectory(gatekeeper)
+if (HANDLE_TYPE_IS_PTR)
+  # do nothing for MVP
+else ()
+  add_subdirectory(gatekeeper)
+endif ()
 # add_subdirectory(keymaster)
