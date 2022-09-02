@@ -24,3 +24,5 @@ int nd_set_cookie_ret(void) { return nd_trusty_errs(); }
 int nd_close_ret(void) { return nd_trusty_errs(); }
 
 int nd_wait_ret(void) { return nd_trusty_errs(); }
+
+void RAND_bytes(void *ptr, size_t size) { memhavoc(ptr, size); }

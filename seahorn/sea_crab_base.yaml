@@ -1,0 +1,20 @@
+verify_options:
+  horn-unify-assumes: false
+  horn-gsa: false
+# ignore control flow
+  horn-vcgen-only-dataflow: false
+# reduce by data dependence
+  horn-bmc-coi: false
+# Use crab solve sea.is_deref
+  horn-bmc-crab-dom: 'zones'
+  horn-bv2-crab-check-is-deref: ''
+# reduce used by object domain
+  # horn-bv2-crab-reduce: ''
+# Use crab infer allocation range
+  # horn-bv2-crab-rng: ''
+# Use crab solve sea.is_deref (preprocessing)
+  seapp-crab-dom: 'zones'
+  seapp-crab-lower-is-deref: true
+  # seapp-crab-stats: ''
+# Statistics
+  # horn-bv2-crab-stats: ''

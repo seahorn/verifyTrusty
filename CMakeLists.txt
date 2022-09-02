@@ -9,6 +9,13 @@ include(CTest)
 # Enable CTest
 enable_testing()
 
+# Enables LLVM builtin functions for memory operations. We do not check these for memory safety.
+# To check for memory safety, set this option to OFF. Then our wrappers will be used instead that
+# check for memory safety and call builtin functions directly.
+option(SEA_LLVM_MEM_BUILTINS "Use LLVM builtins memcpy/memmove without memory safety checks" OFF)
+
+option(SEA_ENABLE_CRAB "Enable Seahorn using Clam/Crab" OFF)
+
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR )
   message (FATAL_ERROR
     "In-source builds are not allowed. Please clean your source tree and try again.")

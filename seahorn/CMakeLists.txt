@@ -196,6 +196,9 @@ function(sea_attach_bc name)
   endif()
 
   target_compile_definitions(${SOURCE_EXE} PRIVATE __SEAHORN__)
+  if(SEA_ENABLE_CRAB)
+    target_compile_definitions(${SOURCE_EXE} PRIVATE __CRAB__)
+  endif()
   target_compile_definitions(${SOURCE_EXE} PRIVATE VACCHECK)
 
   # convert ${SOURCE_EXE} target to llvm
@@ -227,11 +230,17 @@ endfunction()
 
 function(sea_attach_bc_link name)
   sea_link_libraries(${name} sea_libc_trusty.ir)
+  if(SEA_ENABLE_CRAB)
+    sea_link_libraries(${name} crab_proofs.ir)
+  endif()
   sea_attach_bc(${name})
 endfunction()
 
 function(sea_attach_bc_cc_link name)
   sea_link_libraries(${name} sea_libc_trusty.ir)
+  if(SEA_ENABLE_CRAB)
+    sea_link_libraries(${name} crab_proofs.ir)
+  endif()
   sea_attach_bc_cc(${name})
 endfunction()
 
