@@ -33,7 +33,7 @@ jobs:
         run: (test -f ".github/workflows/blacklist.ptr.${{steps.type.outputs.type}}.txt" && echo ::set-output name=exclude_files::"($(cut -f 1 ".github/workflows/blacklist.ptr.${{steps.type.outputs.type}}.txt" | head -c -1 | tr '\n' '|'))" ) || (echo ::set-output name=exclude_files::" ")
 
       - name: Docker
-        run: docker build -t verify-trusty . --file docker/seahorn-dev10-verify-trusty.Dockerfile
+        run: docker build -t verify-trusty . --file docker/seahorn-dev14-verify-trusty.Dockerfile
 
       - name: Get number of Cores
         id: cores
