@@ -30,4 +30,6 @@ int _trusty_put_msg(handle_t handle, uint32_t msg_id);
 
 ssize_t _trusty_send_msg(handle_t handle, struct ipc_msg *msg);
 
+handle_t _trusty_dup(handle_t handle);
+
 #endif

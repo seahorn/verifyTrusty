@@ -15,7 +15,8 @@ handle_t _trusty_port_create(const char *path, uint32_t num_recv_bufs,
   (void)num_recv_bufs;
   (void)recv_buf_size;
 
-  if (!path) return ERR_BAD_PATH;
+  if (!path)
+    return ERR_BAD_PATH;
 
   bool secure = (flags & IPC_PORT_ALLOW_NS_CONNECT) &&
                 !(flags & IPC_PORT_ALLOW_TA_CONNECT);
@@ -44,8 +45,7 @@ handle_t _trusty_accept(handle_t port_handle, uuid_t *peer_uuid) {
       peer_uuid->time_low = 0;
       peer_uuid->time_mid = 0;
       peer_uuid->time_hi_and_version = 0;
-    }
-    else {
+    } else {
       // define peer_uuid to a dummy value
       peer_uuid->time_low = nd_time_low();
       peer_uuid->time_mid = nd_time_mid();
@@ -177,4 +177,10 @@ ssize_t _trusty_send_msg(handle_t handle, struct ipc_msg *msg) {
     return msg->iov[0].iov_len + msg->iov[1].iov_len;
   }
   return ERR_GENERIC;
+}
+
+handle_t _trusty_dup(handle_t handle) {
+  // FIXME: The semantics of duplicate are not documented in code.
+  // For now, just return the original handle
+  return handle;
 }

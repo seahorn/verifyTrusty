@@ -181,3 +181,8 @@ ssize_t _trusty_send_msg(handle_t handle, struct ipc_msg *msg) {
   }
   return ERR_GENERIC;
 }
+handle_t _trusty_dup(handle_t handle) {
+  // FIXME: The semantics of duplicate are not documented (e.g. in code).
+  // For now, just return the original handle
+  return handle;
+}
