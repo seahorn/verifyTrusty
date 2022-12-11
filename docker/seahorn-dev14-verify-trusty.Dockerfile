@@ -60,7 +60,7 @@ RUN rm -Rf build && mkdir build && cd build && cmake -DSEA_LINK=llvm-link-14 -DC
 
 ## Also generate jobs using handle_t as ptr
 WORKDIR /home/usea/verifyTrusty
-RUN rm -Rf build && mkdir build_ptr && cd build_ptr && cmake -DSEA_LINK=llvm-link-14 -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 -DSEAHORN_ROOT=/home/usea/seahorn -DTRUSTY_TARGET=x86_64 -DHANDLE_TYPE_IS_PTR=ON ../ -GNinja && cmake --build .
+RUN rm -Rf build_ptr && mkdir build_ptr && cd build_ptr && cmake -DSEA_LINK=llvm-link-14 -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 -DSEAHORN_ROOT=/home/usea/seahorn -DTRUSTY_TARGET=x86_64 -DHANDLE_TYPE_IS_PTR=ON ../ -GNinja && cmake --build .
 
 ## set default user and wait for someone to login and start running verification tasks
 USER usea
