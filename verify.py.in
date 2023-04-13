@@ -14,28 +14,44 @@ import sys
 SEAHORN_ROOT = "@SEAHORN_ROOT@"
 ASSERT_ERROR_PREFIX = r'^Error: assertion failed'
 # the plan is to have two sets, vac error and info and put filepath:linenumbers) into both
-VACUITY_CHECK_RE = r'^(?P<stream>Info|Error).*(?P<what>vacuity).*(?P<result>passed|failed).*sat\) (?P<debuginfo>.*)$'
+VACUITY_CHECK_RE = r'^(?P<stream>Info|Error).*(?P<what>vacuity|assertion).*(?P<result>passed|failed).*sat\) (?P<debuginfo>.*)$'
 
-def check_vacuity(line, passed_set, failed_set):
+# inspired from https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    ERROR = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+# return true if found a 'vacuity' line, false otherwise
+def check_vacuity(line, key,  passed_set, failed_set):
     m = re.match(VACUITY_CHECK_RE, line)
     if not m:
-        return
+        return False
     debugInfo = m.group('debuginfo')
     if (m.group('stream') == 'Info'
-        and m.group('what') == 'vacuity'
+        and m.group('what') == key
         and m.group('result') == 'passed'):
         passed_set.add(debugInfo.strip())
+        return True
     elif (m.group('stream') == 'Error'
-        and m.group('what') == 'vacuity'
+        and m.group('what') == key
         and m.group('result') == 'failed'):
         failed_set.add(debugInfo.strip())
+        return True
+    return False
 
 
 def main(argv):
     import sea
 
-    def check_vacuity_inner(line, passed_set, failed_set):
-        return check_vacuity(line, passed_set, failed_set)
+    def check_vacuity_inner(line, key, passed_set, failed_set):
+        return check_vacuity(line, key, passed_set, failed_set)
 
     class VerifyCmd(sea.CliCmd):
         def __init__(self):
@@ -66,7 +82,6 @@ def main(argv):
 
         def run(self, args=None, _extra=[]):
             extra = _extra + args.extra
-
             script_dir = os.path.abspath(sys.argv[0])
             script_dir = os.path.dirname(script_dir)
 
@@ -123,10 +138,14 @@ def main(argv):
 
             if args.verbose:
                 print(' '.join(cmd))
-   
-            if args.expect is None:
+            # NOTE: When running in vac mode we always
+            # want to post-process after seahorn run.
+            # Thus, don't exec!
+            # TODO: Remove exec-and-never-return logic
+            # since it complicates how sea is run, possibly
+            # unecessarily.
+            if args.expect is None and not args.vac:
                 os.execv(cmd[0], cmd)
-
             import subprocess
             process = subprocess.Popen(cmd, shell=False,
                                        encoding='utf-8',
@@ -137,21 +156,30 @@ def main(argv):
             found_error = False
             vacuity_passed = set()
             vacuity_failed = set()
+            assertion_passed = set()
+            assertion_failed = set()
             for line in iter(process.stdout.readline, ''):
-                if not args.silent:
-                    print(line, end='')
-
+                assertion_line = check_vacuity_inner(line, 'assertion', assertion_passed, assertion_failed)
+                vacuity_line = False
                 # checks after this line are mutually exclusive
                 if not found_expected and args.expect is not None and line.strip() == args.expect:
                     found_expected = True
                 elif re.match(ASSERT_ERROR_PREFIX, line):
                     found_error = True
                 else:
-                    check_vacuity_inner(line, vacuity_passed, vacuity_failed)
-               
+                    vacuity_line = check_vacuity_inner(line, 'vacuity', vacuity_passed, vacuity_failed)
+                if not args.silent and not vacuity_line and not assertion_line:
+                    print(line, end='')
             process.stdout.close()
             rcode = process.wait()
-
+            if args.vac:
+                for passed in assertion_passed:
+                    print(f"{bcolors.OKGREEN}Assertion passed: {passed}{bcolors.ENDC}")
+                for fail in assertion_failed:
+                    print(f"{bcolors.ERROR}Assertion failed: {fail}{bcolors.ENDC}", file=sys.stderr)
+                fails = (vacuity_failed - vacuity_passed)
+                for fail in fails:
+                    print(f"{bcolors.ERROR}Vacuity failed: {fail}{bcolors.ENDC}", file=sys.stderr)
             if args.vac and found_error:
                 return 2
             elif args.vac and (vacuity_failed - vacuity_passed):
