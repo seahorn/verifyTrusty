@@ -46,4 +46,5 @@ void on_waitany_return(handle_t handle);
 
 // Set the handle to return on next connect call
 void on_connect_return(handle_t handle);
+
 #endif

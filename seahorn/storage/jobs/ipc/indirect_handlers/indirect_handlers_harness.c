@@ -20,11 +20,11 @@
 #include <trusty_log.h>
 #include <uapi/err.h>
 
-#include "ipc.h"
+#include <ipc.h>
 
-#include <sea_handle_table.h>
 #include "seahorn/seahorn.h"
-#include "sea_ipc_helper.h"
+#include <sea_handle_table.h>
+#include <sea_ipc_helper.h>
 
 #include "tipc_limits.h"
 #include <interface/storage/storage.h>

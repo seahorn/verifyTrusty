@@ -7,13 +7,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * Mark nondet functions as not accessing memory
+ * Note: if the attribute is too agressive, the optimizer might remove
+ *       calls to nondet functions, thus reducing the amount of non-determinism.
+ * Note: using each nondet function only once grately simplifies debugging.
+ */
+#define NONDET_FN_ATTR __declspec(noalias)
+
 // generic
 long nd_long(void);
 uint16_t nd_short(void);
 int32_t nd_int(void);
-uint8_t nd_char(void);
+char nd_char(void);
 uint32_t nd_unsigned(void);
-void* nd_ptr(void);
+void *nd_ptr(void);
 
 /**
  * for functions with return pattern:

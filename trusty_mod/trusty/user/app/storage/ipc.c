@@ -21,7 +21,9 @@
 #include <trusty_log.h>
 #include <uapi/err.h>
 
-#include "ipc.h"
+#include "seahorn/seahorn.h"
+#include <ipc.h>
+#include <sea_handle_table.h>
 
 #define MSG_BUF_MAX_SIZE 4096
 
@@ -87,7 +89,6 @@ static int do_connect(struct ipc_port_context *ctx, const uevent_t *ev) {
   handle_t rc1;
   handle_t chan_handle;
   struct ipc_channel_context *chan_ctx;
-
   if (ev->event & IPC_HANDLE_POLL_READY) {
     /* incoming connection: accept it */
     uuid_t peer_uuid;
@@ -98,16 +99,13 @@ static int do_connect(struct ipc_port_context *ctx, const uevent_t *ev) {
     }
 
     chan_handle = (handle_t)rc1;
-
     chan_ctx = ctx->ops.on_connect(ctx, &peer_uuid, chan_handle);
     if (chan_ctx == NULL) {
       TLOGE("%s: failure initializing channel state (%p)\n", __func__, rc1);
       rc = ERR_GENERIC;
       goto err_on_connect;
     }
-
     assert(is_valid_chan_ops(&chan_ctx->ops));
-
     chan_ctx->common.evt_handler = handle_channel;
     chan_ctx->common.handle = chan_handle;
 
@@ -116,9 +114,9 @@ static int do_connect(struct ipc_port_context *ctx, const uevent_t *ev) {
       TLOGE("failed (%d) to set_cookie on chan %p\n", rc, chan_handle);
       goto err_set_cookie;
     }
+
     list_add_tail(&ctx->channels, &chan_ctx->node);
   }
-
   return NO_ERROR;
 
 err_set_cookie:
@@ -130,7 +128,6 @@ err_on_connect:
 
 static int do_handle_msg(struct ipc_channel_context *ctx, const uevent_t *ev) {
   handle_t chan = ev->handle;
-
   /* get message info */
   ipc_msg_info_t msg_inf;
   int rc = get_msg(chan, &msg_inf);
@@ -170,7 +167,6 @@ static int do_handle_msg(struct ipc_channel_context *ctx, const uevent_t *ev) {
     TLOGE("invalid message of size (%d, %p)\n", rc, chan);
     return ERR_NOT_VALID;
   }
-
   rc = ctx->ops.on_handle_msg(ctx, msg_buf, msg_inf.len);
 
 err_handle_msg:
@@ -244,6 +240,7 @@ static int read_response(handle_t session, uint32_t msg_id,
 static int await_response(handle_t session, struct ipc_msg_info *inf) {
   uevent_t uevt;
   long rc = wait(session, &uevt, INFINITE_TIME);
+
   if (rc != NO_ERROR) {
     TLOGE("%s: interrupted waiting for response (%ld)", __func__, rc);
     return rc;
@@ -367,7 +364,7 @@ static void dispatch_event(const uevent_t *ev) {
 
 int ipc_port_create(struct ipc_port_context *ctxp, const char *port_name,
                     size_t queue_size, size_t max_buffer_size, uint32_t flags) {
-  int rc;
+  int rc = -1;
   handle_t rc1;
   assert(ctxp);
   assert(is_valid_port_ops(&ctxp->ops));

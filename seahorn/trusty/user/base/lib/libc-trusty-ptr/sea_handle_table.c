@@ -10,13 +10,16 @@ Implementation of table of handles to be used by IPC
 #include <seahorn/seahorn.h>
 
 #include <stdbool.h>
+extern void sea_printf(const char *format, ...);
+static unsigned int num_choose_handle = 0;
+static unsigned int num_on_waitany_return = 0;
 
 #define ND __declspec(noalias)
 
 // Records the handle to return on wait_any
-handle_t g_on_waitany_handle;
+static handle_t g_on_waitany_handle;
 // Records the handle to return on connect
-handle_t g_on_connect_handle;
+static handle_t g_on_connect_handle;
 
 extern ND bool nd_bool(void);
 
@@ -114,13 +117,17 @@ Non-deterministically chooses an active handle
 
 Blocks if no active handle is available
 */
+// TODO: Change spec to include invalid handle
 handle_t sea_ht_choose_active_handle(void) {
   if (g_on_waitany_handle == NULL) {
     return INVALID_IPC_HANDLE;
   }
   // Check that the user set an active handle
   sassert(g_on_waitany_handle->active == true);
-  return g_on_waitany_handle;
+  handle_t handle = g_on_waitany_handle;
+  // NOTE: unset the handle after one use
+  g_on_waitany_handle = NULL;
+  return handle;
 }
 
 handle_t sea_ht_new_channel(handle_t parent_port) {
@@ -159,7 +166,7 @@ void sea_ht_set_cookie_channel(handle_t handle, void *cookie) {
 
 // assume we are passed a channel
 void *sea_ht_get_cookie_channel(handle_t handle) {
-  return htop(handle)->cookie;
+  return handle == NULL ? NULL : htop(handle)->cookie;
 }
 
 // set cookie for both port/channel type
@@ -168,7 +175,9 @@ void sea_ht_set_cookie(handle_t handle, void *cookie) {
 }
 
 // get cookie for both port/channel type
-void *sea_ht_get_cookie(handle_t handle) { return htop(handle)->cookie; }
+void *sea_ht_get_cookie(handle_t handle) {
+  return handle == NULL ? NULL : htop(handle)->cookie;
+}
 
 // Set the handle to return on next wait_any call.
 // This remains set unless unset explicitly.

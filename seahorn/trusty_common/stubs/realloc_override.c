@@ -4,17 +4,19 @@
 
  */
 
-#include "sea_mem_helper.h"
 #include "nondet.h"
+#include "sea_mem_helper.h"
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
-int8_t *g_ptr0 = NULL;
-size_t g_ptr0_size;
+static int8_t *g_ptr0 = NULL;
+static size_t g_ptr0_size;
 
 void *realloc(void *ptr, size_t new_size) {
-  if (ptr) {free(ptr);}
+  if (ptr) {
+    free(ptr);
+  }
 
   ptr = malloc(new_size);
 
