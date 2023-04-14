@@ -1,9 +1,9 @@
-set(EXTERNAL ${TRUSTY_ROOT}/trusty/user/base/lib/libc-trusty)
+set(TRUSTY_IPC_DIR ${TRUSTY_ROOT}/trusty/user/base/lib/libc-trusty)
+
 add_library(
   sea_libc_trusty
-  ${EXTERNAL}/ipc.c
+  ${TRUSTY_IPC_DIR}/ipc.c
 )
-
 if (HANDLE_TYPE_IS_PTR)
   add_subdirectory(libc-trusty-ptr)
 else ()

@@ -1,0 +1,6 @@
+sea_libc is an implementation of the standard C library for software
+verification in the SEAHORN verification environment.
+
+Directory structure is as follows:
+* include/ -- The include directory that contains header files.
+* src/ --  libc functions that delegate to SEAHORN specific logic.

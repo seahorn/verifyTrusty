@@ -40,6 +40,6 @@ verify_options:
   '-S': ''
 # keep intermediate results for debugging 
   keep-temps: ''
-  temp-dir: /tmp/verifyTrusty
+  temp-dir: /tmp/verifyTrusty_sid
 # time and result stats
   horn-stats: true

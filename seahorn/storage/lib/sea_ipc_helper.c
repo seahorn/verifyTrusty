@@ -1,23 +1,22 @@
-#include <sea_ipc_helper.h>
-#include <stdlib.h>
-#include <trusty_ipc.h>
-#include <seahorn/seahorn.h>
-#include <uapi/err.h>
 #include <ipc.h>
+#include <sea_ipc_helper.h>
+#include <seahorn/seahorn.h>
+#include <stdlib.h>
+#include <uapi/err.h>
 
-void sea_dispatch_event(const uevent_t* ev) {
-    sassert(ev);
+void sea_dispatch_event(const uevent_t *ev) {
+  sassert(ev);
 
-    if (ev->event == IPC_HANDLE_POLL_NONE) {
-        return;
-    }
+  if (ev->event == IPC_HANDLE_POLL_NONE) {
+    return;
+  }
 
-    struct ipc_context* context = ev->cookie;
-    sassert(context);
-    sassert(context->evt_handler);
-    sassert(context->handle == ev->handle);
+  struct ipc_context *context = ev->cookie;
+  sassert(context);
+  sassert(context->evt_handler);
+  sassert(context->handle == ev->handle);
 
-    context->evt_handler(context, ev);
+  context->evt_handler(context, ev);
 }
 
 static void sea_ipc_disconnect_handler(struct ipc_channel_context *context) {
@@ -44,7 +43,7 @@ static int sea_ipc_msg_handler(struct ipc_channel_context *context, void *msg,
 }
 
 static int sync_ipc_msg_handler(struct ipc_channel_context *context, void *msg,
-                               size_t msg_size) {
+                                size_t msg_size) {
   uint8_t *snd_buf = malloc(sizeof(msg_size));
   uint8_t *recv_buf = malloc(sizeof(msg_size));
   struct iovec tx_iov = {
@@ -84,7 +83,7 @@ sea_channel_connect(struct ipc_port_context *parent_ctx,
  */
 struct ipc_channel_context *
 sea_sync_channel_connect(struct ipc_port_context *parent_ctx,
-                    const uuid_t *peer_uuid, handle_t chan_handle) {
+                         const uuid_t *peer_uuid, handle_t chan_handle) {
   struct ipc_channel_context *pctx = malloc(sizeof(struct ipc_channel_context));
   pctx->ops.on_disconnect = sea_ipc_disconnect_handler;
   pctx->ops.on_handle_msg = sync_ipc_msg_handler;
@@ -94,10 +93,11 @@ sea_sync_channel_connect(struct ipc_port_context *parent_ctx,
 /*
  * constant variable of ipc_port_context
  */
-static struct ipc_port_context port_ctx = {
-      .ops = {.on_connect = sea_channel_connect},
-  };
 
-struct ipc_port_context* create_port_context(){
+static struct ipc_port_context port_ctx = {
+    .ops = {.on_connect = sea_channel_connect},
+};
+
+struct ipc_port_context *create_port_context() {
   return &port_ctx;
 }

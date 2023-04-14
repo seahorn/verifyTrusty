@@ -1,5 +1,5 @@
 add_executable(storage_ipc_msg_buffer
-  ${IPC_SRC}
+  ${STORAGE_IPC_SRC}
   msg_buffer_harness.c)
 
 target_include_directories(storage_ipc_msg_buffer 

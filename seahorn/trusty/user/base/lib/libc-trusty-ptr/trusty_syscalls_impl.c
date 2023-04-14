@@ -8,6 +8,12 @@
 #define ND __declspec(noalias)
 
 extern ND void memhavoc(void *ptr, size_t size);
+extern void sea_printf(const char *format, ...);
+
+extern void sea_reset_modified(char *);
+extern bool sea_is_modified(char *);
+extern void sea_tracking_on(void);
+extern void sea_tracking_off(void);
 
 handle_t _trusty_port_create(const char *path, uint32_t num_recv_bufs,
                              uint32_t recv_buf_size, uint32_t flags) {
@@ -82,6 +88,7 @@ extern uint32_t nd_trusty_ipc_event(void);
 int _trusty_wait(handle_t handle, struct uevent *event,
                  uint32_t timeout_msecs) {
   int err = nd_trusty_ipc_err();
+  sea_printf("wait called\n");
   if (err < NO_ERROR)
     return err;
 
@@ -102,6 +109,9 @@ int _trusty_wait_any(uevent_t *ev, uint32_t timeout_msecs) {
     return err;
 
   handle_t h = sea_ht_choose_active_handle();
+  if (h == INVALID_IPC_HANDLE) {
+    return ERR_BAD_HANDLE;
+  }
   ev->handle = h;
   ev->cookie = sea_ht_get_cookie(h);
   ev->event = nd_trusty_ipc_event();
@@ -131,7 +141,6 @@ ssize_t _trusty_read_msg(handle_t handle, uint32_t msg_id, uint32_t offset,
   if (msg_len == 0)
     return ERR_GENERIC;
   sassert(offset <= msg_len);
-
   msg_len -= offset;
 
   sassert(1 <= msg->num_iov);
@@ -139,9 +148,13 @@ ssize_t _trusty_read_msg(handle_t handle, uint32_t msg_id, uint32_t offset,
 
   if (msg_len < msg->iov[0].iov_len) {
     memhavoc(msg->iov[0].iov_base, msg_len);
+    /* reset modified bit to track unexpected writes */
+    sea_reset_modified((char *)(msg->iov[0].iov_base));
     return msg_len;
   }
   memhavoc(msg->iov->iov_base, msg->iov[0].iov_len);
+  /* reset modified bit to track unexpected writes */
+  sea_reset_modified((char *)(msg->iov[0].iov_base));
   size_t num_bytes_read = msg->iov[0].iov_len;
   if (msg->num_iov == 1)
     return num_bytes_read;
@@ -149,10 +162,14 @@ ssize_t _trusty_read_msg(handle_t handle, uint32_t msg_id, uint32_t offset,
 
   if (msg_len < msg->iov[1].iov_len) {
     memhavoc(msg->iov[1].iov_base, msg_len);
+    /* reset modified bit to track unexpected writes */
+    sea_reset_modified((char *)(msg->iov[1].iov_base));
     num_bytes_read += msg_len;
     return num_bytes_read;
   }
   memhavoc(msg->iov->iov_base, msg->iov[1].iov_len);
+  sea_reset_modified((char *)(msg->iov->iov_base));
+
   num_bytes_read += msg->iov[1].iov_len;
   return num_bytes_read;
 }

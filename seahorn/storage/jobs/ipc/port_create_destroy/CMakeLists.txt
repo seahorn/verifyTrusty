@@ -3,7 +3,7 @@
 # This breaks the original spec that handle_t is a 32-bit opaque number
 # and hence breaks our impl of type(handle_t) == 32 bit pointer.
 add_executable(storage_ipc_port_create_destroy
-  ${IPC_SRC}
+  ${STORAGE_IPC_SRC}
   port_create_destroy_harness.c)
 target_include_directories(storage_ipc_port_create_destroy
   PRIVATE ${TRUSTY_ROOT}/trusty/user/app/storage

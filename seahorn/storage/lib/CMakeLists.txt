@@ -4,7 +4,7 @@ add_library(sea_storage_ipc_proofs
 )
 
 target_include_directories(sea_storage_ipc_proofs PRIVATE
-  ${TRUSTY_ROOT}/trusty/user/app/storage) 
+  ${TRUSTY_ROOT}/trusty/user/app/storage)
 
 
 if(SEA_ALLOCATOR_CAN_FAIL)
