@@ -35,7 +35,7 @@ static size_t msg_buf_size;
 static void handle_channel(struct ipc_context *ctx, const struct uevent *ev);
 static void handle_port(struct ipc_context *ctx, const struct uevent *ev);
 
-static int maybe_grow_msg_buf(size_t new_max_size) {
+int maybe_grow_msg_buf(size_t new_max_size) {
   if (new_max_size > msg_buf_size) {
     uint8_t *tmp = realloc(msg_buf, new_max_size);
     if (tmp == NULL) {
@@ -126,7 +126,7 @@ err_on_connect:
   return rc;
 }
 
-static int do_handle_msg(struct ipc_channel_context *ctx, const uevent_t *ev) {
+int do_handle_msg(struct ipc_channel_context *ctx, const uevent_t *ev) {
   handle_t chan = ev->handle;
   /* get message info */
   ipc_msg_info_t msg_inf;

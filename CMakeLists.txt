@@ -35,6 +35,7 @@ set(EXTERNAL_ROOT ${TRUSTY_ROOT}/external)
 option(HANDLE_TYPE_IS_PTR "Build SHADOW MEM versions of jobs" OFF)
 # set C++ stdlib
 string(APPEND CMAKE_CXX_FLAGS " -stdlib=${CPPSTDLIB}")
+set (CMAKE_CXX_STANDARD 17)
 
 # Set gcc-toolchain directory
 if (${TRUSTY_TARGET} STREQUAL "arm32")
