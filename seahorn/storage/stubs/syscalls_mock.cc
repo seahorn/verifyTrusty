@@ -1,3 +1,4 @@
+#include <boost/hana/functional/compose.hpp>
 #include <lk/compiler.h>
 #include <sys/uio.h>
 #include <uapi/err.h> // trusty errors definitions
@@ -37,6 +38,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto set_pointer_fn_get_msg =
       msg_info->id = nd_msg_id();
       msg_info->len = nd_msg_len();
       msg_size = msg_info->len;
+      assume(msg_info->len << (sizeof(size_t) * 8 - 3) == 0);
     };
 
 constexpr auto get_msg_capture_map = boost::hana::make_map(
@@ -64,11 +66,19 @@ constexpr auto read_msg_capture_map = boost::hana::make_map(
 // Emd of mock functions arg
 // ---------------------------------------------
 extern "C" {
-MOCK_FUNCTION(get_msg, ret_fn_get_msg, get_msg_capture_map,
-              (handle_t, ipc_msg_info_t *))
 
-MOCK_FUNCTION(read_msg, ret_fn_read_msg, read_msg_capture_map,
+// TODO: rename Times to AtMaxTimes
+constexpr auto get_msg_expectations = MakeExpectation(
+    Expect(Times, 1_c) ^ AND ^ Expect(ReturnFn, ret_fn_get_msg) ^ AND ^
+    Expect(Capture, get_msg_capture_map));
+MOCK_FUNCTION(get_msg, get_msg_expectations, int, (handle_t, ipc_msg_info_t *))
+
+constexpr auto read_msg_expectations =
+    boost::hana::compose(boost::hana::partial(ReturnFn, ret_fn_read_msg),
+                         boost::hana::partial(Capture, read_msg_capture_map))(
+        DefaultExpectationsMap);
+MOCK_FUNCTION(read_msg, read_msg_expectations, ssize_t,
               (handle_t, uint32_t, uint32_t, ipc_msg_t *))
 
-MOCK_FUNCTION_RETURN_ANY_NO_CAPTURE(put_msg, int, (handle_t, uint32_t))
+LAZY_MOCK_FUNCTION(put_msg, int, (handle_t, uint32_t))
 }
