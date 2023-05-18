@@ -52,7 +52,7 @@ verify_options:
   horn-array-sym-memcpy-unroll-count: 10
 # print memory state as a table
 # XXX still flaky, sometimes only the last byte can be trusted
-  horn-bmc-hexdump: false
+  horn-bmc-hexdump: true
   horn-bmc-logic: QF_ABV
 # Use horn-bv2-lambdas
   horn-bv2-lambdas: true

@@ -55,6 +55,8 @@ sea_channel_onconnect(struct ipc_port_context *parent_ctx,
   return pctx;
 }
 
+extern bool check_sequence(void);
+
 int main(void) {
   sea_tracking_on();
 // This job is for handle_type_is_ptr model
@@ -71,5 +73,4 @@ int main(void) {
   uevent_t event;
   maybe_grow_msg_buf(MSG_BUF_MAX_SIZE);
   do_handle_msg(chan_ctx, &event);
-  return 0;
 }

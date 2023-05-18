@@ -16,8 +16,10 @@
 
 #define INVALID_IPC_MSG_ID 0
 #define ND __declspec(noalias)
-
+#define IS_ALIGN64(n) ((size_t)n << (sizeof(size_t) * 8 - 3)) == 0
 extern "C" {
+extern void sea_printf(const char *format, ...);
+
 ND int nd_trusty_ipc_err(void);
 ND size_t nd_msg_len(void);
 ND size_t nd_size(void);
@@ -38,7 +40,7 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto set_pointer_fn_get_msg =
       msg_info->id = nd_msg_id();
       msg_info->len = nd_msg_len();
       msg_size = msg_info->len;
-      assume(msg_info->len << (sizeof(size_t) * 8 - 3) == 0);
+      assume(IS_ALIGN64(msg_info->len));
     };
 
 constexpr auto get_msg_capture_map = boost::hana::make_map(
@@ -55,7 +57,12 @@ BOOST_HANA_CONSTEXPR_LAMBDA auto set_pointer_fn_read_msg = [](ipc_msg_t *msg) {
   sassert(msg->iov);
   sassert(blob);
   sassert(msg->iov[0].iov_base);
-  memcpy(msg->iov[0].iov_base, blob, msg_size);
+  sassert(IS_ALIGN64(msg_size)); // make sure copying aligned chunk of mem
+  sassert(IS_ALIGN64(msg->iov[0].iov_base)); // make sure dest is aligned
+  sassert(IS_ALIGN64(blob));                 // make sure src is aligned
+  // Since src, dst, msg_size are aligned, we can uplift char by char memcpy
+  // to word by word memcpy
+  memcpy((uint64_t *)msg->iov[0].iov_base, (uint64_t *)blob, msg_size);
   sea_reset_modified((char *)(msg->iov[0].iov_base));
 };
 
@@ -73,10 +80,16 @@ constexpr auto get_msg_expectations = MakeExpectation(
     Expect(Capture, get_msg_capture_map));
 MOCK_FUNCTION(get_msg, get_msg_expectations, int, (handle_t, ipc_msg_info_t *))
 
-constexpr auto read_msg_expectations =
-    boost::hana::compose(boost::hana::partial(ReturnFn, ret_fn_read_msg),
-                         boost::hana::partial(Capture, read_msg_capture_map))(
-        DefaultExpectationsMap);
+// constexpr auto read_msg_expectations =
+//     boost::hana::compose(boost::hana::partial(ReturnFn, ret_fn_read_msg),
+//                          boost::hana::partial(Capture,
+//                          read_msg_capture_map))(
+//                            DefaultExpectationsMap);
+
+constexpr auto read_msg_expectations = MakeExpectation(
+    Expect(Times, 1_c) ^ AND ^ Expect(ReturnFn, ret_fn_read_msg) ^ AND ^
+    Expect(Capture, read_msg_capture_map) ^ AND ^
+    Expect(After, MAKE_PRED_FN_SET(get_msg)));
 MOCK_FUNCTION(read_msg, read_msg_expectations, ssize_t,
               (handle_t, uint32_t, uint32_t, ipc_msg_t *))
 

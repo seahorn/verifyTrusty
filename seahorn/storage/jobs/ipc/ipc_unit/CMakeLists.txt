@@ -5,8 +5,9 @@
 add_executable(storage_ipc_unit
   ${STORAGE_IPC_SRC}
   ipc_unit_harness.c)
-target_include_directories(storage_ipc_unit PRIVATE
-  ${TRUSTY_ROOT}/trusty/user/app/storage)
+target_include_directories(storage_ipc_unit
+  PRIVATE ${TRUSTY_ROOT}/trusty/user/app/storage
+  )
 sea_link_libraries(storage_ipc_unit sea_storage_ipc_proofs.ir)
 sea_link_libraries(storage_ipc_unit sea_libc.ir)
 sea_overlink_libraries(storage_ipc_unit fprintf_override.ir)
