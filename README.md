@@ -19,10 +19,10 @@ Applications running on TEEs are juicy attack targets. The goal of this project 
 All harnesses and stubs within this repository depend on the *Trusty* repository. To run verification jobs locally, follow steps below to install/build missing dependencies and trusty:
 
 #### Dependencies
-- `clang-10.0` and `llvm-link-10.0`
+- `clang-14.0` and `llvm-link-14.0`
 - [Repo](https://source.android.com/setup/build/downloading#installing-repo)
 - SeaHorn, use [docker image](http://seahorn.github.io/seahorn/install/docker/2018/02/24/seahorn-with-docker.html) or [build from source](http://seahorn.github.io/seahorn/install/2016/10/14/install-seahorn.html) then set `$SEA` or `$SEAHORN` environment variable to `<path_to_build_dir>/run/bin/sea` executable.
-- If `libc++-10-dev` is not available, you can use `GNU libstdc++` by adding the following option to `cmake`
+- If `libc++-14-dev` is not available, you can use `GNU libstdc++` by adding the following option to `cmake`
  ```
  -DCPPSTDLIB="libstdc++"
  ```
