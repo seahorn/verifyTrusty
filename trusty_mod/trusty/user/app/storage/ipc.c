@@ -22,7 +22,7 @@
 #include <uapi/err.h>
 
 #include "seahorn/seahorn.h"
-#include <ipc.h>
+#include <ipc_mod.h>
 #include <sea_handle_table.h>
 
 #define MSG_BUF_MAX_SIZE 4096

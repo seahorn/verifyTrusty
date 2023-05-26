@@ -18,7 +18,7 @@ verify_options:
 # context-sensitive type-aware alias analysis 
   dsa: sea-cs-t
 # weak support for function pointers. sea-dsa is better but less stable
-  devirt-functions: 'types'
+  devirt-functions: 'sea-dsa'
 # bit-precise memory-precise operational semantics
   bmc: opsem
   horn-vcgen-use-ite: ''

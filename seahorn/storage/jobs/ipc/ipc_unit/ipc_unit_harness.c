@@ -5,7 +5,7 @@
 #include <trusty_log.h>
 #include <uapi/err.h>
 
-#include <ipc.h>
+#include <ipc_mod.h>
 
 // #include "handle_table.h"
 #include "sea_handle_table.h"
@@ -51,7 +51,6 @@ sea_channel_onconnect(struct ipc_port_context *parent_ctx,
   pctx->ops.on_disconnect = sea_ipc_disconnect_handler;
   pctx->ops.on_handle_msg = sync_ipc_msg_handler;
   // NOTE: Second wait_any call: return channel handle on next wait_any.
-  on_waitany_return(chan_handle);
   return pctx;
 }
 

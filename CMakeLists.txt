@@ -71,6 +71,7 @@ include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/keymaster/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/interface/hwkey/include)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/include/uapi)
 include_directories(${TRUSTY_ROOT}/trusty/user/base/include/shared)
+include_directories(${TRUSTY_MOD_ROOT}/trusty/user/app/storage)  # for ipc_mod header
 if (HANDLE_TYPE_IS_PTR)
   include_directories(${TRUSTY_MOD_ROOT}/trusty/user/base/include/user)
 else ()

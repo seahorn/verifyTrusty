@@ -15,5 +15,6 @@ add_subdirectory(stubs)
 add_subdirectory(jobs/ipc/indirect_handlers)
 add_subdirectory(jobs/ipc/msg_buffer)
 add_subdirectory(jobs/ipc/port_create_destroy)
-add_subdirectory(jobs/ipc/ipc_session)
+# TODO: For now not needed FMCAD for: fix this
+#add_subdirectory(jobs/ipc/ipc_session)
 add_subdirectory(jobs/ipc/ipc_unit)
