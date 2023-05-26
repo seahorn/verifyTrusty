@@ -2,6 +2,12 @@
 
 ![os](https://img.shields.io/badge/os-linux-orange?logo=linux)
 
+This is a custom branch to host a comparison between a `fake` and a `vMock`.
+Specific instructions are [here](#benchmark).
+However, the project must be setup so we continue with usual steps.
+
+
+
 Wiki and useful background materials: https://github.com/agurfinkel/verifyTrusty/wiki
 
 ## Background
@@ -34,9 +40,9 @@ All harnesses and stubs within this repository depend on the *Trusty* repository
 3. Using CMake to build LLVM assembly:
     ```
     mkdir build && cd build && cmake \
-   -DSEA_LINK=llvm-link-10 \
-   -DCMAKE_C_COMPILER=clang-10 \
-   -DCMAKE_CXX_COMPILER=clang++-10 \
+   -DSEA_LINK=llvm-link-14 \
+   -DCMAKE_C_COMPILER=clang-14 \
+   -DCMAKE_CXX_COMPILER=clang++-14 \
    -DSEAHORN_ROOT=<SEAHORN_ROOT> -DTRUSTY_TARGET=<TRUSTY_TARGET> \
    ../ -GNinja
     ```
@@ -87,4 +93,43 @@ All harnesses and stubs within this repository depend on the *Trusty* repository
       `ipc.c`, and rebuild the verification example. Doing so should
       result in `sat` because now overflow is possible.
 
+
+
+<a name="benchmark"></a>
+### Fake env vs vMock env benchmark
+
+#### For fake 
+
+1. Use CMake to build LLVM assembly:
+    ```
+    mkdir build_fake && cd build_fake && cmake \
+   -DSEA_LINK=llvm-link-14 \
+   -DCMAKE_C_COMPILER=clang-14 \
+   -DCMAKE_CXX_COMPILER=clang++-14 \
+   -DSEAHORN_ROOT=<SEAHORN_ROOT> -DTRUSTY_TARGET=x86_64 \
+   -DHANDLE_TYPE_IS_PTR=OFF
+   ../ -GNinja
+   ```
+   
+1. Compile and verify (in the `build_fake` dir) 
+   ```
+   ninja && ./verify seahorn/storage/jobs/ipc/msg_buffer/
+   ```
+#### For vMock
+
+1. Use CMake to build LLVM assembly:
+    ```
+    mkdir build_vmock && cd build_vmock && cmake \
+   -DSEA_LINK=llvm-link-14 \
+   -DCMAKE_C_COMPILER=clang-14 \
+   -DCMAKE_CXX_COMPILER=clang++-14 \
+   -DSEAHORN_ROOT=<SEAHORN_ROOT> -DTRUSTY_TARGET=x86_64 \
+   -DHANDLE_TYPE_IS_PTR=ON
+   ../ -GNinja
+   ```
+   
+1. Compile and verify (in the `build_vmock` dir) 
+   ```
+   ninja && ./verify seahorn/storage/jobs/ipc/ipc_unit
+   ```
 
